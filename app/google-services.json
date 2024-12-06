@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "643708238132",
+    "project_id": "blood-donation-site-map",
+    "storage_bucket": "blood-donation-site-map.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:643708238132:android:ee1c7e3b52ebf8a3aa4d61",
+        "android_client_info": {
+          "package_name": "com.example.vein_blooddonationsite"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBQ955lIM7YqNxpNWQ8IxAtUY5zQxoikjU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
