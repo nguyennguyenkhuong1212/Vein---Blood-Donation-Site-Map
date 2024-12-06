@@ -24,8 +24,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
 
         com.example.vein_blooddonationsite.databinding.ActivityMapsBinding binding = ActivityMapsBinding.inflate(getLayoutInflater());
-        setContentView(R.layout.activity_log_in);
-//        setContentView(binding.getRoot());
+        setContentView(binding.getRoot());
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -58,8 +57,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Add a marker in Sydney and move the camera
         LatLng university = new LatLng(10.729455796866306, 106.69365825582296);
-        googleMap.addMarker(new MarkerOptions().position(university).title("RMIT")
-                .icon(resizeMapIcon("uni", 170, 70)));
+        googleMap.addMarker(new MarkerOptions().position(university).title("Blood Donation Site 1")
+                .icon(resizeMapIcon("marker", 110, 110)));
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(university));
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(university, 13));
         googleMap.getUiSettings().setZoomControlsEnabled(true);
