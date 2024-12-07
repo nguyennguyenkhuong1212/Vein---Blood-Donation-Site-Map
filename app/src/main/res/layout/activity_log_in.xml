@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
@@ -49,7 +50,7 @@
             />
 
         <EditText
-            android:id="@+id/username"
+            android:id="@+id/log_in_username"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Username"
@@ -62,7 +63,7 @@
             android:textColorHint="@color/white"/>
 
         <EditText
-            android:id="@+id/password"
+            android:id="@+id/log_in_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Password"
@@ -80,8 +81,9 @@
             android:layout_height="wrap_content"
             android:backgroundTint="@color/primary"
             android:layout_marginTop="20dp"
-            android:text="Sign In"
-            android:textColor="@android:color/white" />
+            android:text="Login"
+            android:textColor="@android:color/white"
+            tools:ignore="HardcodedText" />
 
         <TextView
             android:id="@+id/signUpLink"
