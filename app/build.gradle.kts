@@ -1,3 +1,5 @@
+import com.android.tools.r8.internal.at
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin)

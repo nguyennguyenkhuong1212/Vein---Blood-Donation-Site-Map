@@ -7,16 +7,18 @@ public class User {
     private int userId;
     private String name;
     private String email;
+    private String username;
     private String password;
     private String bloodType;
     private boolean isSuperUser;
 
     public User() {}
 
-    public User(int userId, String name, String email, String password, String bloodType, boolean isSuperUser) {
+    public User(int userId, String name, String email, String username, String password, String bloodType, boolean isSuperUser) {
         this.userId = userId;
         this.name = name;
         this.email = email;
+        this.username = username;
         this.password = password;
         this.bloodType = bloodType;
         this.isSuperUser = isSuperUser;
@@ -46,6 +48,14 @@ public class User {
         this.email = email;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
     public String getPassword() {
         return password;
     }
@@ -70,6 +80,7 @@ public class User {
         isSuperUser = superUser;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "User{" +
