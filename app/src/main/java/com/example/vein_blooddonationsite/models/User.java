@@ -70,4 +70,15 @@ public class User {
         isSuperUser = superUser;
     }
 
+    @Override
+    public String toString() {
+        return "User{" +
+                "userId=" + userId +
+                "\nname='" + name + '\'' +
+                "\nemail='" + email + '\'' +
+                "\npassword='" + password + '\'' +
+                "\nbloodType='" + bloodType + '\'' +
+                "\nisSuperUser=" + isSuperUser +
+                '}';
+    }
 }

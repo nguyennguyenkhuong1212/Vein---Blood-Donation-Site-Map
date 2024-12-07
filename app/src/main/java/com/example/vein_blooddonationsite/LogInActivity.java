@@ -14,6 +14,8 @@ import com.example.vein_blooddonationsite.models.User;
 import com.google.firebase.Firebase;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.Map;
 import java.util.Objects;
@@ -32,16 +34,15 @@ public class LogInActivity extends AppCompatActivity {
         signInButton.setOnClickListener(v -> {
             String username = String.valueOf(log_in_username.getText());
             String password = String.valueOf(log_in_password.getText());
-            Log.d("Khuong", username);
-            db.collection("blood_site_map_app")
-                    .document("users")
+            db.collection("users")
+                    .whereEqualTo("username", username)
                     .get()
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
-                            DocumentSnapshot document = task.getResult();
-                            Map<String, Object> response = document.getData();
-                            if (document.exists()) {
-                                assert response != null;
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                // Retrieve the document data
+                                Map<String, Object> response = document.getData();
+
                                 User currentUser = new User(
                                         Integer.parseInt(String.valueOf(response.get("userId"))),
                                         String.valueOf(response.get("name")),
@@ -50,12 +51,12 @@ public class LogInActivity extends AppCompatActivity {
                                         String.valueOf(response.get("bloodType")),
                                         Boolean.parseBoolean(String.valueOf(response.get("isSuperUser")))
                                 );
-                                Log.d("Firestore", currentUser.toString());
-                            } else {
-                                Log.d("Firestore", "No such document");
+
+                                Log.d("Khuong", currentUser.toString());
                             }
-                        } else {
-                            Log.w("Firestore", "Error getting document.", task.getException());
+                            }
+                        else {
+                            Log.d("Firestore", "No such document");
                         }
                     });
         });
