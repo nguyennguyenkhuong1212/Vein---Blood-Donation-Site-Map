@@ -1,9 +1,11 @@
 package com.example.vein_blooddonationsite;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -17,7 +19,9 @@ import com.example.vein_blooddonationsite.utils.PasswordUtils;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -36,6 +40,12 @@ public class RegisterActivity extends AppCompatActivity {
         EditText register_confirm_password = findViewById(R.id.register_confirm_password);
         EditText register_blood_type = findViewById(R.id.register_blood_type);
         Button register_button = findViewById(R.id.signUpButton);
+        TextView log_in_link = findViewById(R.id.signInLink);
+
+        log_in_link.setOnClickListener(v -> {
+            Intent intent = new Intent(RegisterActivity.this, LogInActivity.class);
+            startActivity(intent);
+        });
 
         register_button.setOnClickListener(v -> {
             String name = register_name.getText().toString().trim();
@@ -53,10 +63,17 @@ public class RegisterActivity extends AppCompatActivity {
                         int newUserId = task.getResult();
 
                         // Create the user object with the new ID
-                        User user = new User(newUserId, name, email, username, hashedPassword, bloodType, false);
+                        Map<String, Object> userData = new HashMap<>();
+                        userData.put("userId", newUserId);
+                        userData.put("name", name);
+                        userData.put("email", email);
+                        userData.put("username", username);
+                        userData.put("password", password);
+                        userData.put("bloodType", bloodType);
+                        userData.put("isSiteAdmin", false);
+                        userData.put("isSuperUser", false);
 
-                        // Use the username as the document ID and save the user data
-                        db.collection("users").document(username).set(user)
+                        db.collection("users").document(username).set(userData)
                                 .addOnSuccessListener(e -> Toast.makeText(RegisterActivity.this, "User registered successfully", Toast.LENGTH_SHORT).show())
                                 .addOnFailureListener(e -> Toast.makeText(RegisterActivity.this, "Registration failed", Toast.LENGTH_SHORT).show());
 
@@ -96,9 +113,7 @@ public class RegisterActivity extends AppCompatActivity {
             return false;
         }
 
-        Set<String> validBloodTypes = new HashSet<>(Arrays.asList(
-                "A", "B", "AB", "O"
-        ));
+        Set<String> validBloodTypes = new HashSet<>(Arrays.asList("A", "B", "AB", "O"));
 
         if (!validBloodTypes.contains(bloodType)) {
             Toast.makeText(this, "Invalid blood type", Toast.LENGTH_SHORT).show();
@@ -141,7 +156,7 @@ public class RegisterActivity extends AppCompatActivity {
                         int maxUserId = 0;
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             try {
-                                int userId = Integer.parseInt(document.getString("userId"));
+                                int userId = Math.toIntExact(document.getLong("userId"));
                                 if (userId > maxUserId) {
                                     maxUserId = userId;
                                 }

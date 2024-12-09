@@ -2,9 +2,12 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="primary">#fa4032</color>
-    <color name="secondary">#fa812f</color>
-    <color name="beige">#fef3e2</color>
-    <color name="light_orange">#fab12f</color>
+    <color name="primary">#bf070d</color>
+    <color name="secondary">#f3585c</color>
+    <color name="seashell">#fcf0eb</color>
+    <color name="light_orange">#facbaf</color>
+    <color name="seashell_transparent">#80FCF0EB</color>
+    <color name="dark_orange">#dd5c08</color>
     <color name="light_gray">#949494</color>
+    <color name="transparent">#00FFFFFF</color>
 </resources>

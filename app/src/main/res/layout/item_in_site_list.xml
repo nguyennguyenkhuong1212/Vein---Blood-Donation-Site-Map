@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/site_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Site Name"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/site_address"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Site Address" />
+
+    <TextView
+        android:id="@+id/site_contact"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Contact Number" />
+
+    <TextView
+        android:id="@+id/site_operating_hours"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Operating Hours" />
+
+    <TextView
+        android:id="@+id/site_needed_blood_types"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Needed Blood Types" />
+
+</LinearLayout>

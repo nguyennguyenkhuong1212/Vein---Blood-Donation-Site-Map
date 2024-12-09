@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="indicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">@color/seashell_transparent</item>
+    </style>
+    <style name="active">
+        <item name="android:color">@color/secondary</item>
+    </style>
+</resources>

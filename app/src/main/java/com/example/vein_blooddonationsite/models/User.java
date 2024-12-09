@@ -2,7 +2,9 @@ package com.example.vein_blooddonationsite.models;
 
 import androidx.annotation.NonNull;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
 
     private int userId;
     private String name;
@@ -10,17 +12,19 @@ public class User {
     private String username;
     private String password;
     private String bloodType;
+    private boolean isSiteAdmin;
     private boolean isSuperUser;
 
     public User() {}
 
-    public User(int userId, String name, String email, String username, String password, String bloodType, boolean isSuperUser) {
+    public User(int userId, String name, String email, String username, String password, String bloodType, boolean isSiteAdmin, boolean isSuperUser) {
         this.userId = userId;
         this.name = name;
         this.email = email;
         this.username = username;
         this.password = password;
         this.bloodType = bloodType;
+        this.isSiteAdmin = isSiteAdmin;
         this.isSuperUser = isSuperUser;
     }
 
@@ -72,6 +76,14 @@ public class User {
         this.bloodType = bloodType;
     }
 
+    public boolean isSiteAdmin() {
+        return isSiteAdmin;
+    }
+
+    public void setSiteAdmin(boolean siteAdmin) {
+        isSiteAdmin = siteAdmin;
+    }
+
     public boolean isSuperUser() {
         return isSuperUser;
     }
@@ -89,6 +101,7 @@ public class User {
                 "\nemail='" + email + '\'' +
                 "\npassword='" + password + '\'' +
                 "\nbloodType='" + bloodType + '\'' +
+                "\nisSiteAdmin=" + isSiteAdmin +
                 "\nisSuperUser=" + isSuperUser +
                 '}';
     }

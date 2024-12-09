@@ -1,9 +1,15 @@
 package com.example.vein_blooddonationsite;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,9 +30,28 @@ public class LogInActivity extends AppCompatActivity {
         setContentView(R.layout.activity_log_in);
         EditText log_in_username = findViewById(R.id.log_in_username);
         EditText log_in_password = findViewById(R.id.log_in_password);
-        Button signInButton = findViewById(R.id.signInButton);
+        Button log_in_button = findViewById(R.id.signInButton);
 
-        signInButton.setOnClickListener(v -> {
+        TextView register_link = findViewById(R.id.signUpLink);
+
+        register_link.setOnHoverListener((v, event) -> {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_HOVER_ENTER:
+                    register_link.setPaintFlags(register_link.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+                    break;
+                case MotionEvent.ACTION_HOVER_EXIT:
+                    register_link.setPaintFlags(register_link.getPaintFlags() & (~Paint.UNDERLINE_TEXT_FLAG));
+                    break;
+            }
+            return false;
+        });
+
+        register_link.setOnClickListener(v -> {
+            Intent intent = new Intent(LogInActivity.this, RegisterActivity.class);
+            startActivity(intent);
+        });
+
+        log_in_button.setOnClickListener(v -> {
             String username = String.valueOf(log_in_username.getText());
             String password = String.valueOf(log_in_password.getText());
 
@@ -47,30 +72,33 @@ public class LogInActivity extends AppCompatActivity {
                                 String hashedInputPassword = PasswordUtils.hashPassword(password);
 
                                 if (hashedInputPassword.equals(storedHashedPassword)) {
-                                    isPasswordCorrect = true; // Password matches
+                                    Log.d("LogIn", "Login successful");
+                                    Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show();
+
+                                    // Store current user
+                                    User currentUser = new User(
+                                            Integer.parseInt(String.valueOf(response.get("userId"))),
+                                            String.valueOf(response.get("name")),
+                                            String.valueOf(response.get("email")),
+                                            String.valueOf(response.get("username")),
+                                            String.valueOf(response.get("password")),
+                                            String.valueOf(response.get("bloodType")),
+                                            Boolean.parseBoolean(String.valueOf(response.get("isSiteAdmin"))),
+                                            Boolean.parseBoolean(String.valueOf(response.get("isSuperUser")))
+                                    );
+
+                                    Log.d("Login", currentUser.toString());
+                                    Intent intent = new Intent(LogInActivity.this, MainActivity.class);
+                                    intent.putExtra("user", currentUser);
+                                    startActivity(intent);
+                                    finish();
+                                }
+                                else {
+                                    Log.d("LogIn", "Incorrect password");
+                                    Toast.makeText(this, "Incorrect password", Toast.LENGTH_SHORT).show();
                                 }
 
-                                // Create user object
-                                User currentUser = new User(
-                                        Integer.parseInt(String.valueOf(response.get("userId"))),
-                                        String.valueOf(response.get("name")),
-                                        String.valueOf(response.get("email")),
-                                        String.valueOf(response.get("username")),
-                                        String.valueOf(response.get("password")),
-                                        String.valueOf(response.get("bloodType")),
-                                        Boolean.parseBoolean(String.valueOf(response.get("isSuperUser")))
-                                );
-
-                                Log.d("Khuong", currentUser.toString());
-                            }
-
-                            if (isPasswordCorrect) {
-                                Log.d("LogIn", "Login successful");
-                                Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show();
-                                // ... (Proceed with login)
-                            } else {
-                                Log.d("LogIn", "Incorrect password");
-                                Toast.makeText(this, "Incorrect password", Toast.LENGTH_SHORT).show();
+                                break;
                             }
                         } else {
                             Log.d("Firestore", "No such document");
