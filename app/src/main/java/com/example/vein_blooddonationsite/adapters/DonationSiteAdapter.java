@@ -1,5 +1,7 @@
 package com.example.vein_blooddonationsite.adapters;
 
+import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,12 +28,22 @@ public class DonationSiteAdapter extends RecyclerView.Adapter<DonationSiteAdapte
         return new ViewHolder(view);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         DonationSite site = donationSites.get(position);
         holder.nameTextView.setText(site.getName());
         holder.addressTextView.setText(site.getAddress());
-        // ... set other TextViews with data from the DonationSite object
+        holder.contactNumberTextView.setText("Contact Number: " + site.getContactNumber());
+        holder.operatingHoursTextView.setText("Operating Hours: " + site.getOperatingHours());
+        holder.neededBloodTypesTextView.setText(
+                "Needed Blood Types: " + String.join(", ", site.getNeededBloodTypes()));
+
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(holder.itemView.getContext(), ViewSiteActivity.class);
+            intent.putExtra("site", site);
+            holder.itemView.getContext().startActivity(intent);
+        });
     }
 
     @Override
@@ -42,12 +54,17 @@ public class DonationSiteAdapter extends RecyclerView.Adapter<DonationSiteAdapte
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView nameTextView;
         public TextView addressTextView;
-        // ... other TextViews for the item layout
+        public TextView contactNumberTextView;
+        public TextView operatingHoursTextView;
+        public TextView neededBloodTypesTextView;
 
         public ViewHolder(View itemView) {
             super(itemView);
             nameTextView = itemView.findViewById(R.id.site_name); // Use the correct IDs
             addressTextView = itemView.findViewById(R.id.site_address);
+            contactNumberTextView = itemView.findViewById(R.id.site_contact);
+            operatingHoursTextView = itemView.findViewById(R.id.site_operating_hours);
+            neededBloodTypesTextView = itemView.findViewById(R.id.site_needed_blood_types);
             // ... find other TextViews from the item layout
         }
     }

@@ -33,8 +33,8 @@
             android:layout_marginBottom="5dp"
             android:text="Welcome back!"
             android:textColor="@color/primary"
-            android:fontFamily="@font/inter"
-            android:textSize="24sp" />
+            android:fontFamily="@font/instrumentsansbold"
+            android:textSize="25sp" />
 
         <TextView
             android:id="@+id/welcomeSubText"
@@ -44,7 +44,8 @@
             android:textAlignment="center"
             android:layout_marginBottom="20dp"
             android:textColor="@color/secondary"
-            android:textSize="15sp"
+            android:fontFamily="@font/instrumentsansbold"
+            android:textSize="14sp"
             />
 
         <EditText
@@ -81,6 +82,7 @@
             android:layout_marginTop="20dp"
             android:text="Login"
             android:textColor="@android:color/white"
+            android:fontFamily="@font/instrumentsansbold"
             tools:ignore="HardcodedText" />
 
         <LinearLayout
@@ -95,6 +97,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
+                android:fontFamily="@font/instrumentsansbold"
                 android:text="Don't have an account?" />
 
             <Space
@@ -107,6 +110,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
+                android:fontFamily="@font/instrumentsansbold"
                 android:textColor="@color/primary"
                 android:text="Sign up here!" />
 

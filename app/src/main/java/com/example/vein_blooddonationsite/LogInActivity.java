@@ -60,45 +60,50 @@ public class LogInActivity extends AppCompatActivity {
                     .get()
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
-                            boolean isPasswordCorrect = false;
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                // Retrieve the document data
-                                Map<String, Object> response = document.getData();
+                            if (task.getResult().isEmpty()) {
+                                // No user with that username found
+                                Log.d("LogIn", "Username not found");
+                                Toast.makeText(this, "Invalid username or password", Toast.LENGTH_SHORT).show();
+                            } else {
+                                boolean isPasswordCorrect = false;
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    // Retrieve the document data
+                                    Map<String, Object> response = document.getData();
 
-                                // Retrieve the stored hashed password
-                                String storedHashedPassword = String.valueOf(response.get("password"));
+                                    // Retrieve the stored hashed password
+                                    String storedHashedPassword = String.valueOf(response.get("password"));
 
-                                // Hash the input password and compare
-                                String hashedInputPassword = PasswordUtils.hashPassword(password);
+                                    // Hash the input password and compare
+                                    String hashedInputPassword = PasswordUtils.hashPassword(password);
 
-                                if (hashedInputPassword.equals(storedHashedPassword)) {
-                                    Log.d("LogIn", "Login successful");
-                                    Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show();
+                                    if (hashedInputPassword.equals(storedHashedPassword)) {
+                                        Log.d("LogIn", "Login successful");
+                                        Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show();
 
-                                    // Store current user
-                                    User currentUser = new User(
-                                            Integer.parseInt(String.valueOf(response.get("userId"))),
-                                            String.valueOf(response.get("name")),
-                                            String.valueOf(response.get("email")),
-                                            String.valueOf(response.get("username")),
-                                            String.valueOf(response.get("password")),
-                                            String.valueOf(response.get("bloodType")),
-                                            Boolean.parseBoolean(String.valueOf(response.get("isSiteAdmin"))),
-                                            Boolean.parseBoolean(String.valueOf(response.get("isSuperUser")))
-                                    );
+                                        // Store current user
+                                        User currentUser = new User(
+                                                Integer.parseInt(String.valueOf(response.get("userId"))),
+                                                String.valueOf(response.get("name")),
+                                                String.valueOf(response.get("email")),
+                                                String.valueOf(response.get("username")),
+                                                String.valueOf(response.get("password")),
+                                                String.valueOf(response.get("bloodType")),
+                                                Boolean.parseBoolean(String.valueOf(response.get("isSiteAdmin"))),
+                                                Boolean.parseBoolean(String.valueOf(response.get("isSuperUser")))
+                                        );
 
-                                    Log.d("Login", currentUser.toString());
-                                    Intent intent = new Intent(LogInActivity.this, MainActivity.class);
-                                    intent.putExtra("user", currentUser);
-                                    startActivity(intent);
-                                    finish();
+                                        Log.d("Login", currentUser.toString());
+                                        Intent intent = new Intent(LogInActivity.this, MainActivity.class);
+                                        intent.putExtra("user", currentUser);
+                                        startActivity(intent);
+                                        finish();
+                                    } else {
+                                        Log.d("LogIn", "Incorrect password");
+                                        Toast.makeText(this, "Invalid username or password", Toast.LENGTH_SHORT).show();
+                                    }
+
+                                    break;
                                 }
-                                else {
-                                    Log.d("LogIn", "Incorrect password");
-                                    Toast.makeText(this, "Incorrect password", Toast.LENGTH_SHORT).show();
-                                }
-
-                                break;
                             }
                         } else {
                             Log.d("Firestore", "No such document");

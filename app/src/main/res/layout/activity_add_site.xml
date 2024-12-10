@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingHorizontal="30dp"
+    android:backgroundTint="@color/seashell"
+    android:gravity="center"
+    >
+
+    <TextView
+        android:id="@+id/add_site_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:fontFamily="@font/instrumentsansbold"
+        android:text="Add Donation Site"
+        android:textAlignment="center"
+        android:textColor="@color/primary"
+        android:textSize="25sp" />
+
+    <EditText
+        android:id="@+id/add_site_name_edittext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/text_field_background"
+        android:hint="Donation Site Name"
+        android:importantForAutofill="no"
+        android:padding="16dp"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white"
+        android:textSize="16sp" />
+
+    <EditText
+        android:id="@+id/add_site_address_edittext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/text_field_background"
+        android:hint="Address"
+        android:importantForAutofill="no"
+        android:padding="16dp"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white"
+        android:textSize="16sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp">
+
+        <EditText
+            android:id="@+id/add_site_lat_edittext"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="2.5dp"
+            android:layout_weight="1"
+            android:background="@drawable/text_field_background"
+            android:hint="Lattitude"
+            android:padding="16dp"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
+            android:textSize="16sp"
+            tools:ignore="Suspicious0dp" />
+
+        <EditText
+            android:id="@+id/add_site_lng_edittext"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="2.5dp"
+            android:layout_weight="1"
+            android:background="@drawable/text_field_background"
+            android:hint="Longitude"
+            android:padding="16dp"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
+            android:textSize="16sp"
+            tools:ignore="Suspicious0dp" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Leave latitude and longitude blank to auto-detect based on the address, or fill them in for more precise map location."
+        android:textSize="12sp"
+        android:layout_marginTop="5dp"
+        android:layout_marginHorizontal="1dp"
+        android:textColor="@color/light_gray"
+        />
+
+    <EditText
+        android:id="@+id/add_site_contact_edittext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/text_field_background"
+        android:hint="Contact Number"
+        android:importantForAutofill="no"
+        android:padding="16dp"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white"
+        android:textSize="16sp" />
+
+    <EditText
+        android:id="@+id/add_site_hours_edittext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/text_field_background"
+        android:hint="Operating Hours"
+        android:importantForAutofill="no"
+        android:padding="16dp"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/needed_blood_types_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Needed Blood Types"
+        android:fontFamily="@font/instrumentsansbold"
+        android:textColor="@color/primary" />
+
+    <LinearLayout
+        android:id="@+id/blood_types_checkbox_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/text_field_background"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingHorizontal="15dp">
+
+        <CheckBox
+            android:id="@+id/checkbox_o"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:buttonTint="@color/white"
+            android:text="O"
+            android:textColor="@color/white"
+            android:button="@null"
+            android:drawableStart="?android:attr/listChoiceIndicatorMultiple"
+            android:drawableTint="@color/white"/>
+
+        <CheckBox
+            android:id="@+id/checkbox_a"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:buttonTint="@color/white"
+            android:text="A"
+            android:textColor="@color/white"
+            android:button="@null"
+            android:drawableStart="?android:attr/listChoiceIndicatorMultiple"
+            android:drawableTint="@color/white"/>
+
+        <CheckBox
+            android:id="@+id/checkbox_b"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:buttonTint="@color/white"
+            android:text="B"
+            android:textColor="@color/white"
+            android:button="@null"
+            android:drawableStart="?android:attr/listChoiceIndicatorMultiple"
+            android:drawableTint="@color/white"/>
+
+        <CheckBox
+            android:id="@+id/checkbox_ab"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:buttonTint="@color/white"
+            android:text="AB"
+            android:textColor="@color/white"
+            android:button="@null"
+            android:drawableStart="?android:attr/listChoiceIndicatorMultiple"
+            android:drawableTint="@color/white"/>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/add_site_confirm_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:backgroundTint="@color/primary"
+        android:text="Add Site"
+        android:layout_marginTop="25dp"
+        android:layout_marginBottom="16dp"
+        android:fontFamily="@font/instrumentsansbold"/>
+
+</LinearLayout>

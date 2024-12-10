@@ -5,8 +5,7 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:background="@color/seashell"
-    android:paddingStart="30dp"
-    android:paddingEnd="30dp"
+    android:paddingHorizontal="30dp"
     android:paddingBottom="50dp"
     android:layout_centerHorizontal="true"
     android:layout_centerVertical="true">
@@ -32,8 +31,8 @@
             android:layout_marginBottom="5dp"
             android:text="Welcome!"
             android:textColor="@color/primary"
-            android:fontFamily="@font/inter"
-            android:textSize="24sp"/>
+            android:fontFamily="@font/instrumentsansbold"
+            android:textSize="25sp"/>
 
         <TextView
             android:id="@+id/welcomeSubText"
@@ -43,7 +42,8 @@
             android:textAlignment="center"
             android:layout_marginBottom="20dp"
             android:textColor="@color/secondary"
-            android:textSize="15sp"/>
+            android:fontFamily="@font/instrumentsansbold"
+            android:textSize="14sp"/>
 
         <EditText
             android:id="@+id/register_name"
@@ -133,6 +133,7 @@
             android:layout_marginTop="20dp"
             android:text="Sign up"
             android:textColor="@android:color/white"
+            android:fontFamily="@font/instrumentsansbold"
             tools:ignore="HardcodedText" />
 
         <LinearLayout
@@ -147,6 +148,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
+                android:fontFamily="@font/instrumentsansbold"
                 android:text="Already have an account?" />
 
             <Space
@@ -160,6 +162,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
                 android:textColor="@color/primary"
+                android:fontFamily="@font/instrumentsansbold"
                 android:text="Login here!" />
 
         </LinearLayout>

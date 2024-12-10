@@ -5,6 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/seashell"
     tools:context=".MainActivity">
 
     <FrameLayout
@@ -21,8 +22,8 @@
         android:layout_width="0dp"
         android:layout_height="75dp"
         android:background="@color/primary"
-        app:itemIconTint="@color/light_orange"
-        app:itemTextColor="@color/light_orange"
+        app:itemIconTint="@color/white"
+        app:itemTextColor="@color/white"
         app:itemBackground="@color/transparent"
         app:itemActiveIndicatorStyle="@style/indicator"
         app:layout_constraintBottom_toBottomOf="parent"

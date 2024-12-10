@@ -3,6 +3,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="primary">#bf070d</color>
+    <color name="primary_transparent">#CCBF070D</color>
     <color name="secondary">#f3585c</color>
     <color name="seashell">#fcf0eb</color>
     <color name="light_orange">#facbaf</color>

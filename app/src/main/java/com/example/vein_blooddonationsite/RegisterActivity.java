@@ -68,13 +68,17 @@ public class RegisterActivity extends AppCompatActivity {
                         userData.put("name", name);
                         userData.put("email", email);
                         userData.put("username", username);
-                        userData.put("password", password);
+                        userData.put("password", hashedPassword);
                         userData.put("bloodType", bloodType);
                         userData.put("isSiteAdmin", false);
                         userData.put("isSuperUser", false);
 
                         db.collection("users").document(username).set(userData)
-                                .addOnSuccessListener(e -> Toast.makeText(RegisterActivity.this, "User registered successfully", Toast.LENGTH_SHORT).show())
+                                .addOnSuccessListener(e -> {
+                                    Toast.makeText(RegisterActivity.this, "User registered successfully", Toast.LENGTH_SHORT).show();
+                                    Intent intent = new Intent(RegisterActivity.this, LogInActivity.class);
+                                    startActivity(intent);
+                                })
                                 .addOnFailureListener(e -> Toast.makeText(RegisterActivity.this, "Registration failed", Toast.LENGTH_SHORT).show());
 
                     } else {

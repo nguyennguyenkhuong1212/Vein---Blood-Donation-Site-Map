@@ -2,9 +2,10 @@ package com.example.vein_blooddonationsite.models;
 
 import androidx.annotation.NonNull;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class DonationSite {
+public class DonationSite implements Serializable {
 
     private int siteId;
     private String name;
@@ -20,7 +21,9 @@ public class DonationSite {
     public DonationSite() {
     }
 
-    public DonationSite(int siteId, String name, String address, double latitude, double longitude, String contactInfo, String operatingHours, List<String> neededBloodTypes, int adminId, List<Integer> followerIds) {
+    public DonationSite(int siteId, String name, String address, double latitude, double longitude,
+                        String contactInfo, String operatingHours, List<String> neededBloodTypes,
+                        int adminId, List<Integer> followerIds) {
         this.siteId = siteId;
         this.name = name;
         this.address = address;
