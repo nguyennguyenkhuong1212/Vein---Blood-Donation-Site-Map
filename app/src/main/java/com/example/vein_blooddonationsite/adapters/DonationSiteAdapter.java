@@ -5,16 +5,20 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import com.example.vein_blooddonationsite.R;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.vein_blooddonationsite.activities.ViewManageEventActivity;
+import com.example.vein_blooddonationsite.activities.ViewManageSiteActivity;
 import com.example.vein_blooddonationsite.models.DonationSite;
 import java.util.List;
 
 public class DonationSiteAdapter extends RecyclerView.Adapter<DonationSiteAdapter.ViewHolder> {
 
-    public List<DonationSite> donationSites; // Make sure this is public
+    public List<DonationSite> donationSites;
 
     public DonationSiteAdapter(List<DonationSite> donationSites) {
         this.donationSites = donationSites;
@@ -24,7 +28,7 @@ public class DonationSiteAdapter extends RecyclerView.Adapter<DonationSiteAdapte
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_in_site_list, parent, false);
+                .inflate(R.layout.item_in_manage_site_list, parent, false);
         return new ViewHolder(view);
     }
 
@@ -39,8 +43,14 @@ public class DonationSiteAdapter extends RecyclerView.Adapter<DonationSiteAdapte
         holder.neededBloodTypesTextView.setText(
                 "Needed Blood Types: " + String.join(", ", site.getNeededBloodTypes()));
 
-        holder.itemView.setOnClickListener(v -> {
-            Intent intent = new Intent(holder.itemView.getContext(), ViewSiteActivity.class);
+        holder.editButton.setOnClickListener(v -> {
+            Intent intent = new Intent(holder.itemView.getContext(), ViewManageSiteActivity.class);
+            intent.putExtra("site", site);
+            holder.itemView.getContext().startActivity(intent);
+        });
+
+        holder.viewEventButton.setOnClickListener(v -> {
+            Intent intent = new Intent(holder.itemView.getContext(), ViewManageEventActivity.class);
             intent.putExtra("site", site);
             holder.itemView.getContext().startActivity(intent);
         });
@@ -57,6 +67,8 @@ public class DonationSiteAdapter extends RecyclerView.Adapter<DonationSiteAdapte
         public TextView contactNumberTextView;
         public TextView operatingHoursTextView;
         public TextView neededBloodTypesTextView;
+        private LinearLayout editButton;
+        private LinearLayout viewEventButton;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -65,6 +77,8 @@ public class DonationSiteAdapter extends RecyclerView.Adapter<DonationSiteAdapte
             contactNumberTextView = itemView.findViewById(R.id.site_contact);
             operatingHoursTextView = itemView.findViewById(R.id.site_operating_hours);
             neededBloodTypesTextView = itemView.findViewById(R.id.site_needed_blood_types);
+            editButton = itemView.findViewById(R.id.edit_site_button);
+            viewEventButton = itemView.findViewById(R.id.view_event_button);
             // ... find other TextViews from the item layout
         }
     }

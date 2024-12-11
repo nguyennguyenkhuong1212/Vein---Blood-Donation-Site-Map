@@ -10,18 +10,18 @@
     >
 
     <TextView
-        android:id="@+id/add_site_title"
+        android:id="@+id/view_manage_site_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:fontFamily="@font/instrumentsansbold"
-        android:text="Add Donation Site"
+        android:text="Edit Donation Site"
         android:textAlignment="center"
         android:textColor="@color/primary"
         android:textSize="25sp" />
 
     <EditText
-        android:id="@+id/add_site_name_edittext"
+        android:id="@+id/view_manage_site_name_edittext"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
@@ -36,7 +36,7 @@
         android:singleLine="true"/>
 
     <EditText
-        android:id="@+id/add_site_address_edittext"
+        android:id="@+id/view_manage_site_address_edittext"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
@@ -57,7 +57,7 @@
         android:layout_marginTop="10dp">
 
         <EditText
-            android:id="@+id/add_site_lat_edittext"
+            android:id="@+id/view_manage_site_lat_edittext"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="2.5dp"
@@ -70,10 +70,11 @@
             android:textSize="16sp"
             tools:ignore="Suspicious0dp"
             android:ellipsize="end"
-            android:singleLine="true"/>
+            android:singleLine="true"
+            />
 
         <EditText
-            android:id="@+id/add_site_lng_edittext"
+            android:id="@+id/view_manage_site_lng_edittext"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="2.5dp"
@@ -86,8 +87,8 @@
             android:textSize="16sp"
             tools:ignore="Suspicious0dp"
             android:ellipsize="end"
-            android:singleLine="true"/>
-
+            android:singleLine="true"
+            />
     </LinearLayout>
 
     <TextView
@@ -101,7 +102,7 @@
         />
 
     <EditText
-        android:id="@+id/add_site_contact_edittext"
+        android:id="@+id/view_manage_site_contact_edittext"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
@@ -113,10 +114,11 @@
         android:textColorHint="@color/white"
         android:textSize="16sp"
         android:ellipsize="end"
-        android:singleLine="true"/>
+        android:singleLine="true"
+        />
 
     <EditText
-        android:id="@+id/add_site_hours_edittext"
+        android:id="@+id/view_manage_site_hours_edittext"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
@@ -128,7 +130,8 @@
         android:textColorHint="@color/white"
         android:textSize="16sp"
         android:ellipsize="end"
-        android:singleLine="true"/>
+        android:singleLine="true"
+        />
 
     <TextView
         android:layout_width="match_parent"
@@ -141,16 +144,17 @@
         />
 
     <TextView
-        android:id="@+id/needed_blood_types_label"
+        android:id="@+id/view_manage_needed_blood_types_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:text="Needed Blood Types"
         android:fontFamily="@font/instrumentsansbold"
-        android:textColor="@color/primary" />
+        android:textColor="@color/primary"
+        />
 
     <LinearLayout
-        android:id="@+id/blood_types_checkbox_group"
+        android:id="@+id/view_manage_blood_types_checkbox_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
@@ -160,7 +164,7 @@
         android:paddingHorizontal="15dp">
 
         <CheckBox
-            android:id="@+id/checkbox_o"
+            android:id="@+id/view_manage_checkbox_o"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -172,7 +176,7 @@
             android:drawableTint="@color/white"/>
 
         <CheckBox
-            android:id="@+id/checkbox_a"
+            android:id="@+id/view_manage_checkbox_a"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -184,7 +188,7 @@
             android:drawableTint="@color/white"/>
 
         <CheckBox
-            android:id="@+id/checkbox_b"
+            android:id="@+id/view_manage_checkbox_b"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -196,7 +200,7 @@
             android:drawableTint="@color/white"/>
 
         <CheckBox
-            android:id="@+id/checkbox_ab"
+            android:id="@+id/view_manage_checkbox_ab"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -217,7 +221,7 @@
         android:layout_marginTop="25dp">
 
         <Button
-            android:id="@+id/add_site_confirm_button"
+            android:id="@+id/view_manage_site_confirm_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/primary"
@@ -226,7 +230,7 @@
             android:layout_marginEnd="16dp" />
 
         <Button
-            android:id="@+id/add_site_cancel_button"
+            android:id="@+id/view_manage_site_cancel_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/secondary"

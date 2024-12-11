@@ -17,16 +17,22 @@
         android:theme="@style/Theme.VeinBloodDonationSite"
         tools:targetApi="31">
         <activity
-            android:name=".utils.ViewSiteManageActivity"
+            android:name=".activities.AddEventActivity"
             android:exported="false" />
         <activity
-            android:name=".AddSiteActivity"
+            android:name=".activities.ViewManageEventActivity"
             android:exported="false" />
         <activity
-            android:name=".RegisterActivity"
+            android:name=".activities.ViewManageSiteActivity"
             android:exported="false" />
         <activity
-            android:name=".LogInActivity"
+            android:name=".activities.AddSiteActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.RegisterActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.LogInActivity"
             android:exported="false" />
 
         <meta-data
@@ -34,7 +40,7 @@
             android:value="AIzaSyAmYG0ewlmb4zaJAkC6pBsFjqi0NBQu-Po" />
 
         <activity
-            android:name=".MainActivity"
+            android:name=".activities.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -1,4 +1,4 @@
-package com.example.vein_blooddonationsite;
+package com.example.vein_blooddonationsite.activities;
 
 import android.location.Address;
 import android.location.Geocoder;
@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.vein_blooddonationsite.R;
 import com.example.vein_blooddonationsite.models.DonationSite;
 import com.example.vein_blooddonationsite.models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -47,10 +48,13 @@ public class AddSiteActivity extends AppCompatActivity {
         CheckBox checkbox_b = findViewById(R.id.checkbox_b);
         CheckBox checkbox_ab = findViewById(R.id.checkbox_ab);
         Button addSiteConfirmButton = findViewById(R.id.add_site_confirm_button);
+        Button cancelButton = findViewById(R.id.add_site_cancel_button);
 
         addSiteConfirmButton.setOnClickListener(v -> {
             String siteName = siteNameEditText.getText().toString().trim();
             String siteAddress = siteAddressEditText.getText().toString().trim();
+            String siteLat = siteLatEditText.getText().toString().trim();
+            String siteLng = siteLngEditText.getText().toString().trim();
             String contactNumber = contactNumberEditText.getText().toString().trim();
             String operatingHours = operatingHoursEditText.getText().toString().trim();
 
@@ -58,25 +62,31 @@ public class AddSiteActivity extends AppCompatActivity {
             final double[] latitude = {0.0}; // Declare latitude as a final array
             final double[] longitude = {0.0}; // Declare longitude as a final array
 
-            try {
-                if (!siteLatEditText.getText().toString().isEmpty() && !siteLngEditText.getText().toString().isEmpty()) {
-                    latitude[0] = Double.parseDouble(siteLatEditText.getText().toString().trim());
-                    longitude[0] = Double.parseDouble(siteLngEditText.getText().toString().trim());
-                } else {
-                    List<Address> addresses = geocoder.getFromLocationName(siteAddress, 1);
-                    if (addresses != null && !addresses.isEmpty()) {
-                        Address address = addresses.get(0);
-                        latitude[0] = address.getLatitude();
-                        longitude[0] = address.getLongitude();
+            if (!siteLat.isEmpty() && !siteLng.isEmpty()){
+                latitude[0] = Double.parseDouble(siteLat);
+                longitude[0] = Double.parseDouble(siteLng);
+            }
+            else {
+                try {
+                    if (!siteLatEditText.getText().toString().isEmpty() && !siteLngEditText.getText().toString().isEmpty()) {
+                        latitude[0] = Double.parseDouble(siteLatEditText.getText().toString().trim());
+                        longitude[0] = Double.parseDouble(siteLngEditText.getText().toString().trim());
                     } else {
-                        Toast.makeText(AddSiteActivity.this, "Unable to find address", Toast.LENGTH_SHORT).show();
-                        return;
+                        List<Address> addresses = geocoder.getFromLocationName(siteAddress, 1);
+                        if (addresses != null && !addresses.isEmpty()) {
+                            Address address = addresses.get(0);
+                            latitude[0] = address.getLatitude();
+                            longitude[0] = address.getLongitude();
+                        } else {
+                            Toast.makeText(AddSiteActivity.this, "Unable to find address", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
                     }
+                } catch (IOException e) {
+                    Log.e("AddSiteActivity", "Geocoding error", e);
+                    Toast.makeText(AddSiteActivity.this, "Unable to find coordinate", Toast.LENGTH_SHORT).show();
+                    return;
                 }
-            } catch (IOException e) {
-                Log.e("AddSiteActivity", "Geocoding error", e);
-                Toast.makeText(AddSiteActivity.this, "Geocoding error", Toast.LENGTH_SHORT).show();
-                return;
             }
 
             // Get needed blood types from checkboxes
@@ -94,7 +104,10 @@ public class AddSiteActivity extends AppCompatActivity {
                 neededBloodTypes.add("AB");
             }
 
-            // ... (Perform validation if needed)
+            if (!operatingHours.matches("^([0-1]?[0-9]|2[0-3]):[0-5][0-9] - ([0-1]?[0-9]|2[0-3]):[0-5][0-9]$")) {
+                Toast.makeText(AddSiteActivity.this, "Invalid operating hours format", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
             getNewSiteId(task -> {
                 if (task.isSuccessful()) {
@@ -115,7 +128,7 @@ public class AddSiteActivity extends AppCompatActivity {
 
                     // Add the new site to Firestore
                     db.collection("donationSites")
-                            .add(newSite)
+                            .document(String.valueOf(newSiteId)).set(newSite)
                             .addOnSuccessListener(documentReference -> {
                                 Toast.makeText(AddSiteActivity.this, "Site added successfully", Toast.LENGTH_SHORT).show();
                                 finish();
@@ -132,6 +145,8 @@ public class AddSiteActivity extends AppCompatActivity {
                 }
             });
         });
+
+        cancelButton.setOnClickListener(v -> finish());
     }
 
     private void getNewSiteId(OnCompleteListener<Integer> listener) {

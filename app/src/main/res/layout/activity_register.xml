@@ -43,7 +43,8 @@
             android:layout_marginBottom="20dp"
             android:textColor="@color/secondary"
             android:fontFamily="@font/instrumentsansbold"
-            android:textSize="14sp"/>
+            android:textSize="14sp"
+            />
 
         <EditText
             android:id="@+id/register_name"
@@ -57,7 +58,10 @@
             android:textSize="16sp"
             android:layout_marginTop="10dp"
             android:textColorHint="@color/white"
-            android:importantForAutofill="no"/>
+            android:importantForAutofill="no"
+            android:ellipsize="end"
+            android:singleLine="true"
+            />
 
         <EditText
             android:id="@+id/register_username"
@@ -70,7 +74,10 @@
             android:textColor="@color/white"
             android:textSize="16sp"
             android:layout_marginTop="10dp"
-            android:textColorHint="@color/white"/>
+            android:textColorHint="@color/white"
+            android:ellipsize="end"
+            android:singleLine="true"
+            />
 
         <EditText
             android:id="@+id/register_email"
@@ -83,7 +90,10 @@
             android:textColor="@color/white"
             android:textSize="16sp"
             android:layout_marginTop="10dp"
-            android:textColorHint="@color/white"/>
+            android:textColorHint="@color/white"
+            android:ellipsize="end"
+            android:singleLine="true"
+            />
 
         <EditText
             android:id="@+id/register_password"
@@ -96,7 +106,10 @@
             android:textColor="@color/white"
             android:textSize="16sp"
             android:layout_marginTop="10dp"
-            android:textColorHint="@color/white"/>
+            android:textColorHint="@color/white"
+            android:ellipsize="end"
+            android:singleLine="true"
+            />
 
         <EditText
             android:id="@+id/register_confirm_password"
@@ -109,7 +122,10 @@
             android:textColor="@color/white"
             android:textSize="16sp"
             android:layout_marginTop="10dp"
-            android:textColorHint="@color/white"/>
+            android:textColorHint="@color/white"
+            android:ellipsize="end"
+            android:singleLine="true"
+            />
 
         <EditText
             android:id="@+id/register_blood_type"
@@ -123,6 +139,8 @@
             android:textSize="16sp"
             android:layout_marginTop="10dp"
             android:textColorHint="@color/white"
+            android:ellipsize="end"
+            android:singleLine="true"
             />
 
         <Button
@@ -134,7 +152,8 @@
             android:text="Sign up"
             android:textColor="@android:color/white"
             android:fontFamily="@font/instrumentsansbold"
-            tools:ignore="HardcodedText" />
+            tools:ignore="HardcodedText"
+            />
 
         <LinearLayout
             android:layout_width="match_parent"

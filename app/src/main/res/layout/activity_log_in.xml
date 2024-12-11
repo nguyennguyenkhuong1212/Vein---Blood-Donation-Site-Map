@@ -5,8 +5,7 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:background="@color/seashell"
-    android:paddingStart="30dp"
-    android:paddingEnd="30dp"
+    android:paddingHorizontal="30dp"
     android:paddingBottom="50dp"
     android:layout_centerHorizontal="true"
     android:layout_centerVertical="true">
@@ -59,7 +58,9 @@
             android:textColor="@color/white"
             android:textSize="16sp"
             android:layout_marginTop="10dp"
-            android:textColorHint="@color/white"/>
+            android:textColorHint="@color/white"
+            android:ellipsize="end"
+            android:singleLine="true"/>
 
         <EditText
             android:id="@+id/log_in_password"
@@ -72,7 +73,9 @@
             android:textColor="@color/white"
             android:textSize="16sp"
             android:layout_marginTop="10dp"
-            android:textColorHint="@color/white"/>
+            android:textColorHint="@color/white"
+            android:ellipsize="end"
+            android:singleLine="true"/>
 
         <Button
             android:id="@+id/signInButton"

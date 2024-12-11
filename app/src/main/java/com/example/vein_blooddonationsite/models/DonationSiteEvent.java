@@ -9,6 +9,7 @@ public class DonationSiteEvent {
 
     private int eventId;
     private int siteId;
+    private String eventName;
     private Date eventDate;
     private LocalTime startTime;
     private LocalTime endTime;
@@ -17,9 +18,10 @@ public class DonationSiteEvent {
     public DonationSiteEvent() {
     }
 
-    public DonationSiteEvent(int eventId, int siteId, Date eventDate, LocalTime startTime, LocalTime endTime, boolean isRecurring) {
+    public DonationSiteEvent(int eventId, int siteId, String eventName, Date eventDate, LocalTime startTime, LocalTime endTime, boolean isRecurring) {
         this.eventId = eventId;
         this.siteId = siteId;
+        this.eventName = eventName;
         this.eventDate = eventDate;
         this.startTime = startTime;
         this.endTime = endTime;
@@ -40,6 +42,14 @@ public class DonationSiteEvent {
 
     public void setSiteId(int siteId) {
         this.siteId = siteId;
+    }
+
+    public String getEventName() {
+        return eventName;
+    }
+
+    public void setEventName(String eventName) {
+        this.eventName = eventName;
     }
 
     public Date getEventDate() {
@@ -78,11 +88,12 @@ public class DonationSiteEvent {
     @Override
     public String toString() {
         return "DonationSiteEvent{" +
-                "eventId='" + eventId + '\'' +
-                "\nsiteId='" + siteId + '\'' +
+                "eventId=" + eventId +
+                "\nsiteId=" + siteId +
+                "\neventName='" + eventName + '\'' +
                 "\neventDate=" + eventDate +
-                "\nstartTime='" + startTime + '\'' +
-                "\nendTime='" + endTime + '\'' +
+                "\nstartTime=" + startTime +
+                "\nendTime=" + endTime +
                 "\nisRecurring=" + isRecurring +
                 '}';
     }

@@ -1,4 +1,4 @@
-package com.example.vein_blooddonationsite;
+package com.example.vein_blooddonationsite.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,6 +7,9 @@ import android.util.Log;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.example.vein_blooddonationsite.fragments.ManageSitePage;
+import com.example.vein_blooddonationsite.fragments.ProfilePage;
+import com.example.vein_blooddonationsite.R;
 import com.example.vein_blooddonationsite.fragments.HomePage;
 import com.example.vein_blooddonationsite.models.User;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -27,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
                     Bundle bundle = new Bundle();
                     bundle.putSerializable("user", currentUser);
                     selectedFragment.setArguments(bundle);
+                } else if (itemId == R.id.bottom_bar_profile) {
+                    selectedFragment = new ProfilePage();
                 }
 
                 if (selectedFragment != null) {

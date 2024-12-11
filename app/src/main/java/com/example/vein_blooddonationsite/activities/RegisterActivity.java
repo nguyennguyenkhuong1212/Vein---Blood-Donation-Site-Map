@@ -1,4 +1,4 @@
-package com.example.vein_blooddonationsite;
+package com.example.vein_blooddonationsite.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,7 +11,7 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.vein_blooddonationsite.models.User;
+import com.example.vein_blooddonationsite.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -73,7 +73,7 @@ public class RegisterActivity extends AppCompatActivity {
                         userData.put("isSiteAdmin", false);
                         userData.put("isSuperUser", false);
 
-                        db.collection("users").document(username).set(userData)
+                        db.collection("users").document(String.valueOf(newUserId)).set(userData)
                                 .addOnSuccessListener(e -> {
                                     Toast.makeText(RegisterActivity.this, "User registered successfully", Toast.LENGTH_SHORT).show();
                                     Intent intent = new Intent(RegisterActivity.this, LogInActivity.class);
