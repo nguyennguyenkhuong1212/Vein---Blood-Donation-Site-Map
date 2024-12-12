@@ -126,4 +126,25 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/view_all_donation_sites_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        android:visibility="gone"
+        android:layout_marginTop="70dp"
+        />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingHorizontal="36dp"
+        android:textSize="20sp"
+        android:textColor="@color/primary"
+        android:text="No donation sites found."
+        android:gravity="center"
+        android:visibility="gone"
+        android:id="@+id/view_all_donation_sites_empty_inform"
+        />
+
 </FrameLayout>

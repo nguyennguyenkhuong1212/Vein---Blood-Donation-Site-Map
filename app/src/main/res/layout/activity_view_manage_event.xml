@@ -46,7 +46,10 @@
         android:id="@+id/events_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone"/>
+        android:layout_marginTop="40dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        android:visibility="gone"
+        />
 
     <TextView
         android:layout_width="match_parent"
@@ -61,7 +64,7 @@
         />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/add_event_button"
+        android:id="@+id/add_event_float_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"

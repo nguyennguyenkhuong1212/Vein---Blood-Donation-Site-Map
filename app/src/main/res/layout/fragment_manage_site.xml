@@ -22,7 +22,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingHorizontal="36dp"
-        android:textSize="20dp"
+        android:textSize="20sp"
         android:textColor="@color/primary"
         android:text="No donation sites found.\nTap the '+' button to create one."
         android:gravity="center"
@@ -43,7 +43,7 @@
         />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/donation_sites_recycler_view"
+        android:id="@+id/view_manage_donation_sites_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"

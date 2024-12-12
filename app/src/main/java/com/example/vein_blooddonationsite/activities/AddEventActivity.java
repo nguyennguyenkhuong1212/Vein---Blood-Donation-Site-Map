@@ -1,5 +1,6 @@
 package com.example.vein_blooddonationsite.activities;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
@@ -7,6 +8,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.vein_blooddonationsite.R;
@@ -22,32 +24,54 @@ import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 public class AddEventActivity extends AppCompatActivity {
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_event);
 
+        EditText eventNameEditText = findViewById(R.id.event_name_edittext);
         EditText eventDateEditText = findViewById(R.id.event_date_edittext);
         EditText startTimeEditText = findViewById(R.id.start_time_edittext);
         EditText endTimeEditText = findViewById(R.id.end_time_edittext);
         CheckBox recurringCheckbox = findViewById(R.id.recurring_checkbox);
         Button addEventButton = findViewById(R.id.add_event_button);
+        Button cancelButton = findViewById(R.id.add_event_cancel_button);
 
         DonationSite site = (DonationSite) getIntent().getSerializableExtra("site");
 
+        cancelButton.setOnClickListener(v -> {
+            finish();
+        });
+
         addEventButton.setOnClickListener(v -> {
             if (site != null) {
+                String eventName = eventNameEditText.getText().toString().trim();
                 String dateString = eventDateEditText.getText().toString().trim();
                 String startTimeString = startTimeEditText.getText().toString().trim();
                 String endTimeString = endTimeEditText.getText().toString().trim();
                 boolean isRecurring = recurringCheckbox.isChecked();
+
+                if (!dateString.matches("^(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/[0-9]{4}$")) {
+                    Toast.makeText(AddEventActivity.this, "Invalid date format. Please use dd/MM/yyyy", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // Validate time format (HH:mm)
+                if (!startTimeString.matches("^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$") ||
+                        !endTimeString.matches("^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$")) {
+                    Toast.makeText(AddEventActivity.this, "Invalid time format. Please use HH:mm", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
                 // Validation (add more validation as needed)
                 if (dateString.isEmpty() || startTimeString.isEmpty() || endTimeString.isEmpty()) {
@@ -59,36 +83,57 @@ public class AddEventActivity extends AppCompatActivity {
                     SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
                     Date eventDate = dateFormat.parse(dateString);
 
-                    DateTimeFormatter timeFormatter = null;
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                        timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
-                    }
-                    LocalTime startTime;
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                        startTime = LocalTime.parse(startTimeString, timeFormatter);
-                    } else {
-                        startTime = null;
-                    }
-                    LocalTime endTime;
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                        endTime = LocalTime.parse(endTimeString, timeFormatter);
-                    } else {
-                        endTime = null;
+                    DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+                    LocalTime startTime = LocalTime.parse(startTimeString, timeFormatter);
+                    LocalTime endTime = LocalTime.parse(endTimeString, timeFormatter);
+
+                    if (!startTime.isBefore(endTime)) {
+                        Toast.makeText(AddEventActivity.this, "Start time must be before end time", Toast.LENGTH_SHORT).show();
+                        return;
                     }
 
                     getNewEventId(task -> {
                         if (task.isSuccessful()) {
                             int newEventId = task.getResult();
 
+                            // Create maps for startTime and endTime
+                            Map<String, Integer> startTimeMap = new HashMap<>();
+                            startTimeMap.put("hour", startTime.getHour());
+                            startTimeMap.put("minute", startTime.getMinute());
+                            startTimeMap.put("second", startTime.getSecond());
+                            startTimeMap.put("nano", startTime.getNano());
+
+                            Map<String, Integer> endTimeMap = new HashMap<>();
+                            endTimeMap.put("hour", endTime.getHour());
+                            endTimeMap.put("minute", endTime.getMinute());
+                            endTimeMap.put("second", endTime.getSecond());
+                            endTimeMap.put("nano", endTime.getNano());
+
                             DonationSiteEvent newEvent = new DonationSiteEvent(
                                     newEventId,
                                     site.getSiteId(),
                                     eventName,
                                     eventDate,
-                                    startTime,
-                                    endTime,
+                                    startTimeMap,
+                                    endTimeMap,
                                     isRecurring
                             );
+
+                            db.collection("events")
+                                    .document(String.valueOf(newEventId))
+                                    .set(newEvent)
+                                    .addOnSuccessListener(documentReference -> {
+                                        Toast.makeText(AddEventActivity.this, "Event added successfully", Toast.LENGTH_SHORT).show();
+                                        finish();
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Toast.makeText(AddEventActivity.this, "Error adding event", Toast.LENGTH_SHORT).show();
+                                        Log.e("AddEventActivity", "Error adding event", e);
+                                    });
+                        } else {
+                            // Handle error getting new event ID
+                            Log.e("AddEventActivity", "Error getting new event ID", task.getException());
+                            Toast.makeText(AddEventActivity.this, "Error adding event", Toast.LENGTH_SHORT).show();
                         }
                     });
 

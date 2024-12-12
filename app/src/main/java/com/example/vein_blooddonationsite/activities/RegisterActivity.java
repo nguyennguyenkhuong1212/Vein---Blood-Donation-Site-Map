@@ -45,6 +45,7 @@ public class RegisterActivity extends AppCompatActivity {
         log_in_link.setOnClickListener(v -> {
             Intent intent = new Intent(RegisterActivity.this, LogInActivity.class);
             startActivity(intent);
+            finish();
         });
 
         register_button.setOnClickListener(v -> {

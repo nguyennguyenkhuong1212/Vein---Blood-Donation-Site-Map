@@ -55,6 +55,7 @@
         android:textSize="10sp"
         android:textAlignment="center"
         android:layout_marginTop="10dp"
+        android:visibility="gone"
         />
 
 </LinearLayout>

@@ -50,7 +50,7 @@ public class ManageSitePage extends Fragment {
         manageSiteTitle = view.findViewById(R.id.manage_site_title);
         manageSiteInformSiteAdmin = view.findViewById(R.id.manage_site_inform_site_admin);
         manageSiteInform = view.findViewById(R.id.manage_site_inform);
-        donationSitesRecyclerView = view.findViewById(R.id.donation_sites_recycler_view);
+        donationSitesRecyclerView = view.findViewById(R.id.view_manage_donation_sites_recycler_view);
         donationSitesRecyclerView.setAdapter(adapter);
 
         if (currentUser.isSiteAdmin()) {
@@ -117,10 +117,13 @@ public class ManageSitePage extends Fragment {
                 } else {
                     manageSiteInform.setVisibility(View.VISIBLE);
                 }
+                donationSitesRecyclerView.setVisibility(View.GONE);
             } else {
                 // Donation sites found
                 Log.d("MSP", sites.toString());
                 donationSitesRecyclerView.setVisibility(View.VISIBLE);
+                manageSiteInformSiteAdmin.setVisibility(View.GONE);
+                manageSiteInform.setVisibility(View.GONE);
                 adapter.donationSites = sites;
                 adapter.notifyDataSetChanged();
             }

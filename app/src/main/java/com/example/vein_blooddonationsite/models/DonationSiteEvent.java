@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import java.time.LocalTime;
 import java.util.Date;
+import java.util.Map;
 
 public class DonationSiteEvent {
 
@@ -11,14 +12,14 @@ public class DonationSiteEvent {
     private int siteId;
     private String eventName;
     private Date eventDate;
-    private LocalTime startTime;
-    private LocalTime endTime;
+    private Map<String, Integer> startTime;
+    private Map<String, Integer> endTime;
     private boolean isRecurring;
 
     public DonationSiteEvent() {
     }
 
-    public DonationSiteEvent(int eventId, int siteId, String eventName, Date eventDate, LocalTime startTime, LocalTime endTime, boolean isRecurring) {
+    public DonationSiteEvent(int eventId, int siteId, String eventName, Date eventDate, Map<String, Integer> startTime, Map<String, Integer> endTime, boolean isRecurring) {
         this.eventId = eventId;
         this.siteId = siteId;
         this.eventName = eventName;
@@ -60,19 +61,19 @@ public class DonationSiteEvent {
         this.eventDate = eventDate;
     }
 
-    public LocalTime getStartTime() {
+    public Map<String, Integer> getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(LocalTime startTime) {
+    public void setStartTime(Map<String, Integer> startTime) {
         this.startTime = startTime;
     }
 
-    public LocalTime getEndTime() {
+    public Map<String, Integer> getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(LocalTime endTime) {
+    public void setEndTime(Map<String, Integer> endTime) {
         this.endTime = endTime;
     }
 
