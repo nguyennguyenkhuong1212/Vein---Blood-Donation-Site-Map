@@ -237,125 +237,88 @@ public class HomePage extends Fragment {
     @RequiresApi(api = Build.VERSION_CODES.O)
     @SuppressLint("NotifyDataSetChanged")
     private void fetchFilteredDonationSites(int distance, List<String> bloodTypes, String eventDateString) {
-        List<User> users = new ArrayList<>();
-        db.collection("users")
-            .get()
-            .addOnCompleteListener(userTask -> {
-                if (userTask.isSuccessful()) {
-                    for (QueryDocumentSnapshot userDocument : userTask.getResult()) {
-                        User user = userDocument.toObject(User.class);
-                        users.add(user);
+        showLoading();
+
+        new Thread(() -> {
+            List<User> users = new ArrayList<>();
+            try {
+                // Fetch users
+                List<User> fetchedUsers = Tasks.await(db.collection("users").get()).toObjects(User.class);
+                users.addAll(fetchedUsers);
+
+                // Fetch events
+                fetchEvents(task -> {
+                    if (!task.isSuccessful()) {
+                        Log.w("HomePage", "Error fetching events.", task.getException());
+                        throw new RuntimeException("Failed to fetch events", task.getException());
+                    }
+                });
+
+                // Get location
+                getLocation(task -> {
+                    if (!task.isSuccessful()) {
+                        Log.e("HomePage", "Error getting location", task.getException());
+                        throw new RuntimeException("Failed to get location", task.getException());
+                    }
+                });
+
+                // Fetch donation sites
+                List<DonationSite> filteredSites = new ArrayList<>();
+                List<DonationSite> fetchedSites =
+                        Tasks.await(
+                                db.collection("donationSites").get())
+                                .toObjects(DonationSite.class);
+
+                // Convert eventDateString to Date object
+                Date eventDate = getDate(eventDateString);
+
+                for (DonationSite site : fetchedSites) {
+                    // Distance filter (if you want to use it)
+                    if (userLocation != null) {
+                        double distanceToSite = calculateDistance(
+                                userLocation.getLatitude(), userLocation.getLongitude(),
+                                site.getLatitude(), site.getLongitude()
+                        );
+                        if (distanceToSite > distance) {
+                            continue;
+                        }
                     }
 
-                    fetchEvents(task -> {
-                        if (task.isSuccessful()) {
-                            // Convert eventDateString to Date object
-                            Date eventDate = getDate(eventDateString);
+                    // Blood type filter
+                    if (!bloodTypes.isEmpty() && !new HashSet<>(site.getNeededBloodTypes()).containsAll(bloodTypes)) {
+                        continue;
+                    }
 
-                            getLocation(locationTask -> {
-                                if (locationTask.isSuccessful()) {
-                                    userLocation = locationTask.getResult();
-
-                                    db.collection("donationSites")
-                                        .addSnapshotListener((siteSnapshot, siteError) -> {
-                                            if (siteError != null) {
-                                                Log.w("HomePage", "Listen failed.", siteError);
-                                                return;
-                                            }
-
-                                            List<DonationSite> filteredSites = new ArrayList<>();
-                                            if (siteSnapshot != null) {
-                                                for (QueryDocumentSnapshot siteDocument : siteSnapshot) {
-                                                    try {
-                                                        Map<String, Object> data = siteDocument.getData();
-
-                                                        int adminId = ((Long) Objects.requireNonNull(data.get("adminId"))).intValue();
-                                                        int siteId = ((Long) Objects.requireNonNull(data.get("siteId"))).intValue();
-                                                        String name = (String) data.get("name");
-                                                        String address = (String) data.get("address");
-                                                        double latitude = ((Double) data.get("latitude")).doubleValue();
-                                                        double longitude = ((Double) data.get("longitude")).doubleValue();
-                                                        String contactNumber = (String) data.get("contactNumber");
-                                                        String operatingHours = (String) data.get("operatingHours");
-                                                        List<String> neededBloodTypes = (List<String>) data.get("neededBloodTypes");
-                                                        List<Integer> followerIds = (List<Integer>) data.get("followerIds");
-
-                                                        DonationSite site = new DonationSite(siteId, name, address, latitude, longitude,
-                                                                contactNumber, operatingHours, neededBloodTypes, adminId, followerIds);
-
-                                                        Log.d("HomePage", site.toString());
-
-                                                        // Apply filters
-                                                        boolean matchesFilter = true;
-
-                                                        // Distance filter
-//                                                          if (userLocation != null) {
-//                                                              double distanceToSite = calculateDistance(
-//                                                                      userLocation.getLatitude(), userLocation.getLongitude(),
-//                                                                      site.getLatitude(), site.getLongitude()
-//                                                              );
-//                                                              if (distanceToSite > distance) {
-//                                                                  matchesFilter = false;
-//                                                              }
-//                                                          }
-
-                                                        // Blood type filter
-//                                                          if (!bloodTypes.isEmpty() && !new HashSet<>(site.getNeededBloodTypes()).containsAll(bloodTypes)) {
-//                                                              matchesFilter = false;
-//                                                          }
-
-                                                        // Event date filter
-                                                        if (eventDate != null) {
-                                                            boolean hasMatchingEvent = false;
-                                                            for (DonationSiteEvent event : site.getEvents(events)) {
-                                                                Log.d("HomePage", String.valueOf(sdf.format(event.getEventDate()).equals(sdf.format(eventDate))));
-                                                                if (sdf.format(event.getEventDate()).equals(sdf.format(eventDate))) {
-                                                                    hasMatchingEvent = true;
-                                                                    break;
-                                                                }
-                                                            }
-                                                            if (!hasMatchingEvent) {
-                                                                matchesFilter = false;
-                                                            }
-                                                        }
-
-                                                        Log.d("HomePage", String.valueOf(matchesFilter));
-
-                                                        if (matchesFilter) {
-                                                            filteredSites.add(site);
-                                                        }
-
-                                                    } catch (ClassCastException | NullPointerException e) {
-                                                        Log.e("HomePage", "Error parsing document data: " + e.getMessage());
-                                                    }
-                                                }
-                                            }
-
-                                            // Update the RecyclerView with the filtered sites
-                                            if (filteredSites.isEmpty()) {
-                                                Log.d("HomePage", "Not found!");
-                                                emptyInform.setVisibility(View.VISIBLE);
-                                                viewDonationSitesRecyclerView.setVisibility(View.GONE);
-                                            } else {
-                                                Log.d("HomePage", filteredSites.toString());
-                                                viewDonationSitesRecyclerView.setVisibility(View.VISIBLE);
-                                                adapter.donationSites = filteredSites;
-                                                adapter.users = users;
-                                                adapter.notifyDataSetChanged();
-                                            }
-                                        });
-                                } else {
-                                    Log.e("HomePage", "Error getting location", locationTask.getException());
-                                }
-                            });
-                        } else {
-                            Log.w("HomePage", "Error fetching events.", task.getException());
+                    // Event date filter
+                    if (eventDate != null) {
+                        for (DonationSiteEvent event : site.getEvents(events)) {
+                            if (sdf.format(event.getEventDate()).equals(sdf.format(eventDate))) {
+                                filteredSites.add(site);
+                                break;
+                            }
                         }
-                    });
-                } else {
-                    Log.w("HomePage", "Error getting users.", userTask.getException());
+                    }
                 }
-            });
+
+                requireActivity().runOnUiThread(() -> {
+                    if (filteredSites.isEmpty()) {
+                        Log.d("HomePage", "Not found!");
+                        emptyInform.setVisibility(View.VISIBLE);
+                        viewDonationSitesRecyclerView.setVisibility(View.GONE);
+                    } else {
+                        Log.d("HomePage", filteredSites.toString());
+                        viewDonationSitesRecyclerView.setVisibility(View.VISIBLE);
+                        adapter.donationSites = filteredSites;
+                        adapter.users = users;
+                        adapter.notifyDataSetChanged();
+                    }
+                    hideLoading();
+                });
+            } catch (Exception e) {
+                Log.e("HomePage", "Error fetching data", e);
+                requireActivity().runOnUiThread(this::hideLoading);
+            }
+        }).start();
     }
 
     private static @Nullable Date getDate(String eventDateString) {
