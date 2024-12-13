@@ -3,6 +3,8 @@ package com.example.vein_blooddonationsite.models;
 import androidx.annotation.NonNull;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class DonationSite implements Serializable {
@@ -114,6 +116,16 @@ public class DonationSite implements Serializable {
 
     public void setFollowerIds(List<Integer> followerIds) {
         this.followerIds = followerIds;
+    }
+
+    public List<DonationSiteEvent> getEvents(List<DonationSiteEvent> allEvents) {
+        List<DonationSiteEvent> siteEvents = new ArrayList<>(); // Create a new list for this site's events
+        for (DonationSiteEvent event : allEvents){
+            if (event.getSiteId() == siteId) {
+                siteEvents.add(event);
+            }
+        }
+        return siteEvents;
     }
 
     @NonNull

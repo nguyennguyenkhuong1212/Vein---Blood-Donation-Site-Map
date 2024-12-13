@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.vein_blooddonationsite.R;
+import com.example.vein_blooddonationsite.activities.ViewEventActivity;
 import com.example.vein_blooddonationsite.models.DonationSite;
 import com.example.vein_blooddonationsite.models.User;
 
@@ -60,11 +61,11 @@ public class ViewDonationSiteAdapter extends RecyclerView.Adapter<ViewDonationSi
         holder.neededBloodTypesTextView.setText(
                 "Needed Blood Types: " + String.join(", ", site.getNeededBloodTypes()));
 
-//        holder.viewEventButton.setOnClickListener(v -> {
-//            Intent intent = new Intent(holder.itemView.getContext(), ViewSiteEventsActivity.class);
-//            intent.putExtra("site", site);
-//            holder.itemView.getContext().startActivity(intent);
-//        });
+        holder.viewEventButton.setOnClickListener(v -> {
+            Intent intent = new Intent(holder.itemView.getContext(), ViewEventActivity.class);
+            intent.putExtra("site", site);
+            holder.itemView.getContext().startActivity(intent);
+        });
     }
 
     @Override

@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/seashell"
+    android:orientation="vertical"
+    android:layout_gravity="center"
+    tools:context=".activities.FilterActivity">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Filter Options"
+        android:textAlignment="center"
+        android:textSize="25sp"
+        android:layout_marginTop="25dp"
+        android:textColor="@color/primary"
+        android:fontFamily="@font/instrumentsansbold"
+        android:id="@+id/manage_site_title"
+        />
+
+    <LinearLayout
+        android:id="@+id/filter_popup"
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="30dp"
+        android:paddingVertical="50dp"
+        android:background="@drawable/popup_background"
+        android:layout_gravity="center"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Distance"
+            android:textColor="@android:color/white"
+            android:fontFamily="@font/instrumentsansbold"
+            android:textSize="20sp"
+            android:layout_marginBottom="8dp"/>
+
+        <SeekBar
+            android:id="@+id/distance_seekbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="100"
+            android:progressBackgroundTint="@color/white"
+            android:progressTint="@android:color/white"
+            android:thumbTint="@android:color/white"
+            android:layout_marginBottom="16dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Blood Type"
+            android:textColor="@android:color/white"
+            android:fontFamily="@font/instrumentsansbold"
+            android:textSize="20sp"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="8dp"/>
+
+        <LinearLayout
+            android:id="@+id/blood_types_checkbox_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingHorizontal="8dp"
+            android:background="@drawable/view_manage_site_button"
+            android:layout_marginBottom="10dp"
+            >
+
+            <CheckBox
+                android:id="@+id/checkbox_o"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:buttonTint="@color/white"
+                android:text="O"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:button="@null"
+                android:drawableStart="?android:attr/listChoiceIndicatorMultiple"
+                android:drawableTint="@color/white"/>
+
+            <CheckBox
+                android:id="@+id/checkbox_a"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:buttonTint="@color/white"
+                android:text="A"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:button="@null"
+                android:drawableStart="?android:attr/listChoiceIndicatorMultiple"
+                android:drawableTint="@color/white"/>
+
+            <CheckBox
+                android:id="@+id/checkbox_b"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:buttonTint="@color/white"
+                android:text="B"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:button="@null"
+                android:drawableStart="?android:attr/listChoiceIndicatorMultiple"
+                android:drawableTint="@color/white"/>
+
+            <CheckBox
+                android:id="@+id/checkbox_ab"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:buttonTint="@color/white"
+                android:text="AB"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:button="@null"
+                android:drawableStart="?android:attr/listChoiceIndicatorMultiple"
+                android:drawableTint="@color/white"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="15dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp"
+                >
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Event Date:"
+                    android:textColor="@android:color/white"
+                    android:fontFamily="@font/instrumentsansbold"
+                    android:textSize="20sp"
+                    />
+
+                <Space
+                    android:layout_width="5dp"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/filter_event_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/white"
+                    android:fontFamily="@font/instrumentsans"
+                    android:textSize="20sp"
+                    />
+
+            </LinearLayout>
+
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="8dp"/>
+
+            <LinearLayout
+                android:layout_width="175dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:background="@drawable/view_manage_site_button"
+                android:paddingVertical="7dp"
+                android:id="@+id/open_datepicker_button"
+                >
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/baseline_date_range_24"
+                    app:tint="@color/white" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Select Date"
+                    android:textColor="@color/white"
+                    android:fontFamily="@font/instrumentsansbold"
+                    android:textSize="15sp"
+                    android:layout_marginStart="8dp"
+                    />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="25dp"
+        android:layout_gravity="bottom"
+        android:gravity="center"
+        android:layout_marginBottom="120dp"
+        >
+
+        <Button
+            android:id="@+id/filter_confirm_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/primary"
+            android:text="Submit"
+            android:fontFamily="@font/instrumentsansbold"
+            android:layout_marginEnd="16dp" />
+
+        <Button
+            android:id="@+id/filter_cancel_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/secondary"
+            android:text="Cancel"
+            android:fontFamily="@font/instrumentsansbold"
+            android:layout_marginStart="16dp" />
+
+    </LinearLayout>
+
+</FrameLayout>

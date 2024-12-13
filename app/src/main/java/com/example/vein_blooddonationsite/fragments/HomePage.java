@@ -1,11 +1,27 @@
 package com.example.vein_blooddonationsite.fragments;
 
+import static android.app.Activity.RESULT_OK;
+
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -13,28 +29,84 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.vein_blooddonationsite.R;
+import com.example.vein_blooddonationsite.activities.FilterActivity;
+import com.example.vein_blooddonationsite.activities.LogInActivity;
+import com.example.vein_blooddonationsite.activities.RegisterActivity;
 import com.example.vein_blooddonationsite.adapters.ViewDonationSiteAdapter;
 import com.example.vein_blooddonationsite.models.DonationSite;
+import com.example.vein_blooddonationsite.models.DonationSiteEvent;
 import com.example.vein_blooddonationsite.models.User;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
+@RequiresApi(api = Build.VERSION_CODES.O)
 public class HomePage extends Fragment {
 
     TextView emptyInform;
     RecyclerView viewDonationSitesRecyclerView;
     ViewDonationSiteAdapter adapter;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private static final int FILTER_REQUEST_CODE = 1;
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 2;
+    private Location userLocation;
+    List<DonationSiteEvent> events = new ArrayList<>();
+    private ProgressBar loadingSpinner;
+    private View overlay;
+    @SuppressLint("SimpleDateFormat")
+    private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+    private final ActivityResultLauncher<Intent> filterLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                    Intent data = result.getData();
+                    int distance = data.getIntExtra("distance", 0);
+                    ArrayList<String> bloodTypes = data.getStringArrayListExtra("bloodTypes");
+                    String eventDate = data.getStringExtra("eventDate");
+                    assert eventDate != null;
+                    showLoading();
+                    fetchFilteredDonationSites(distance, bloodTypes, eventDate);
+                    hideLoading();
+                }
+            });
+
+    private final ActivityResultLauncher<String[]> requestPermissionsLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
+                Boolean fineLocationGranted = result.get(Manifest.permission.ACCESS_FINE_LOCATION);
+                if (fineLocationGranted != null && fineLocationGranted) {
+                    getCurrentLocation(null);
+                } else {
+                    // Handle permission denial (optional)
+                    Toast.makeText(getContext(), "Location permission denied", Toast.LENGTH_SHORT).show();
+                }
+            });
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -42,54 +114,14 @@ public class HomePage extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         emptyInform = view.findViewById(R.id.view_all_donation_sites_empty_inform);
+        loadingSpinner = view.findViewById(R.id.loading_spinner);
+        overlay = view.findViewById(R.id.loading_spinner_overlay);
 
         ImageButton filterButton = view.findViewById(R.id.filter_button);
-        filterButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                PopupMenu popupMenu = new PopupMenu(getContext(), v);
 
-                // Inflate the menu using a try-catch block
-                try {
-                    popupMenu.inflate(R.menu.filter_menu);
-                } catch (Exception e) {
-                    Log.e("HomePage", "Error inflating menu: " + e.getMessage());
-                    // Handle the error appropriately (e.g., show a toast or log the error)
-                    return; // Stop further execution if menu inflation fails
-                }
-
-                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @SuppressLint("NonConstantResourceId")
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        // Handle filter item clicks here
-                        int itemId = item.getItemId();
-                        if (itemId == R.id.filter_distance) {
-                            Log.d("Filter menu", "distance");
-                        } else if (itemId == R.id.filter_blood_type) {
-                            Log.d("Filter menu", "blood_type");
-                        } else if (item.getItemId() == R.id.select_date) {
-                            // Show the date picker dialog
-                            final Calendar calendar = Calendar.getInstance();
-                            int year = calendar.get(Calendar.YEAR);
-                            int month = calendar.get(Calendar.MONTH);
-                            int day = calendar.get(Calendar.DAY_OF_MONTH);
-
-                            DatePickerDialog datePickerDialog = new DatePickerDialog(
-                                    requireContext(),
-                                    (view1, year1, month1, dayOfMonth) -> {
-                                        // Handle the selected date
-                                        Log.d("Selected Date", year1 + "-" + (month1 + 1) + "-" + dayOfMonth);
-                                        // ... your filtering logic for event date ...
-                                    },
-                                    year, month, day);
-                            datePickerDialog.show();
-                        }
-                        return true;
-                    }
-                });
-                popupMenu.show();
-            }
+        filterButton.setOnClickListener(v -> {
+            Intent intent = new Intent(requireActivity(), FilterActivity.class);
+            filterLauncher.launch(intent);
         });
 
         adapter = new ViewDonationSiteAdapter(new ArrayList<>(), new ArrayList<>());
@@ -146,11 +178,11 @@ public class HomePage extends Fragment {
 
                                 if (sites.isEmpty()) {
                                     // No donation sites found
-                                    Log.d("MSP", "Not found!");
+                                    Log.d("HP", "Not found!");
                                     emptyInform.setVisibility(View.VISIBLE);
                                 } else {
                                     // Donation sites found
-                                    Log.d("MSP", sites.toString());
+                                    Log.d("HP", sites.toString());
                                     viewDonationSitesRecyclerView.setVisibility(View.VISIBLE);
                                     adapter.donationSites = sites;
                                     adapter.users = users;
@@ -161,5 +193,233 @@ public class HomePage extends Fragment {
                     Log.w("HomePage", "Error getting users.", task.getException());
                 }
             });
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void fetchEvents(OnCompleteListener<Void> listener) {
+        db.collection("events")
+                .addSnapshotListener((response, error) -> {
+                    if (error != null) {
+                        Log.d("HP", "Listen failed.");
+                        listener.onComplete(Tasks.forException(error));
+                        return;
+                    }
+
+                    assert response != null;
+                    for (QueryDocumentSnapshot document : response) {
+                        DonationSiteEvent event = document.toObject(DonationSiteEvent.class);
+
+                        LocalDate today = LocalDate.now();
+                        LocalDate eventLocalDate = event.getEventDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                        if (!eventLocalDate.isBefore(today)) {
+                            events.add(event);
+                        }
+                    }
+
+                    listener.onComplete(Tasks.forResult(null));
+                });
+    }
+
+    private void showLoading() {
+        requireActivity().runOnUiThread(() -> {
+            overlay.setVisibility(View.VISIBLE);
+            loadingSpinner.setVisibility(View.VISIBLE);
+        });
+    }
+
+    private void hideLoading() {
+        requireActivity().runOnUiThread(() -> {
+            overlay.setVisibility(View.GONE);
+            loadingSpinner.setVisibility(View.GONE);
+        });
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @SuppressLint("NotifyDataSetChanged")
+    private void fetchFilteredDonationSites(int distance, List<String> bloodTypes, String eventDateString) {
+        List<User> users = new ArrayList<>();
+        db.collection("users")
+            .get()
+            .addOnCompleteListener(userTask -> {
+                if (userTask.isSuccessful()) {
+                    for (QueryDocumentSnapshot userDocument : userTask.getResult()) {
+                        User user = userDocument.toObject(User.class);
+                        users.add(user);
+                    }
+
+                    fetchEvents(task -> {
+                        if (task.isSuccessful()) {
+                            // Convert eventDateString to Date object
+                            Date eventDate = getDate(eventDateString);
+
+                            getLocation(locationTask -> {
+                                if (locationTask.isSuccessful()) {
+                                    userLocation = locationTask.getResult();
+
+                                    db.collection("donationSites")
+                                        .addSnapshotListener((siteSnapshot, siteError) -> {
+                                            if (siteError != null) {
+                                                Log.w("HomePage", "Listen failed.", siteError);
+                                                return;
+                                            }
+
+                                            List<DonationSite> filteredSites = new ArrayList<>();
+                                            if (siteSnapshot != null) {
+                                                for (QueryDocumentSnapshot siteDocument : siteSnapshot) {
+                                                    try {
+                                                        Map<String, Object> data = siteDocument.getData();
+
+                                                        int adminId = ((Long) Objects.requireNonNull(data.get("adminId"))).intValue();
+                                                        int siteId = ((Long) Objects.requireNonNull(data.get("siteId"))).intValue();
+                                                        String name = (String) data.get("name");
+                                                        String address = (String) data.get("address");
+                                                        double latitude = ((Double) data.get("latitude")).doubleValue();
+                                                        double longitude = ((Double) data.get("longitude")).doubleValue();
+                                                        String contactNumber = (String) data.get("contactNumber");
+                                                        String operatingHours = (String) data.get("operatingHours");
+                                                        List<String> neededBloodTypes = (List<String>) data.get("neededBloodTypes");
+                                                        List<Integer> followerIds = (List<Integer>) data.get("followerIds");
+
+                                                        DonationSite site = new DonationSite(siteId, name, address, latitude, longitude,
+                                                                contactNumber, operatingHours, neededBloodTypes, adminId, followerIds);
+
+                                                        Log.d("HomePage", site.toString());
+
+                                                        // Apply filters
+                                                        boolean matchesFilter = true;
+
+                                                        // Distance filter
+//                                                          if (userLocation != null) {
+//                                                              double distanceToSite = calculateDistance(
+//                                                                      userLocation.getLatitude(), userLocation.getLongitude(),
+//                                                                      site.getLatitude(), site.getLongitude()
+//                                                              );
+//                                                              if (distanceToSite > distance) {
+//                                                                  matchesFilter = false;
+//                                                              }
+//                                                          }
+
+                                                        // Blood type filter
+//                                                          if (!bloodTypes.isEmpty() && !new HashSet<>(site.getNeededBloodTypes()).containsAll(bloodTypes)) {
+//                                                              matchesFilter = false;
+//                                                          }
+
+                                                        // Event date filter
+                                                        if (eventDate != null) {
+                                                            boolean hasMatchingEvent = false;
+                                                            for (DonationSiteEvent event : site.getEvents(events)) {
+                                                                Log.d("HomePage", String.valueOf(sdf.format(event.getEventDate()).equals(sdf.format(eventDate))));
+                                                                if (sdf.format(event.getEventDate()).equals(sdf.format(eventDate))) {
+                                                                    hasMatchingEvent = true;
+                                                                    break;
+                                                                }
+                                                            }
+                                                            if (!hasMatchingEvent) {
+                                                                matchesFilter = false;
+                                                            }
+                                                        }
+
+                                                        Log.d("HomePage", String.valueOf(matchesFilter));
+
+                                                        if (matchesFilter) {
+                                                            filteredSites.add(site);
+                                                        }
+
+                                                    } catch (ClassCastException | NullPointerException e) {
+                                                        Log.e("HomePage", "Error parsing document data: " + e.getMessage());
+                                                    }
+                                                }
+                                            }
+
+                                            // Update the RecyclerView with the filtered sites
+                                            if (filteredSites.isEmpty()) {
+                                                Log.d("HomePage", "Not found!");
+                                                emptyInform.setVisibility(View.VISIBLE);
+                                                viewDonationSitesRecyclerView.setVisibility(View.GONE);
+                                            } else {
+                                                Log.d("HomePage", filteredSites.toString());
+                                                viewDonationSitesRecyclerView.setVisibility(View.VISIBLE);
+                                                adapter.donationSites = filteredSites;
+                                                adapter.users = users;
+                                                adapter.notifyDataSetChanged();
+                                            }
+                                        });
+                                } else {
+                                    Log.e("HomePage", "Error getting location", locationTask.getException());
+                                }
+                            });
+                        } else {
+                            Log.w("HomePage", "Error fetching events.", task.getException());
+                        }
+                    });
+                } else {
+                    Log.w("HomePage", "Error getting users.", userTask.getException());
+                }
+            });
+    }
+
+    private static @Nullable Date getDate(String eventDateString) {
+        Date eventDate = null;
+        if (!eventDateString.isEmpty()) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            try {
+                eventDate = dateFormat.parse(eventDateString);
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return eventDate;
+    }
+
+    private void getLocation(OnCompleteListener<Location> listener) {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            requestPermissionsLauncher.launch(new String[]{Manifest.permission.ACCESS_FINE_LOCATION});
+        } else {
+            getCurrentLocation(listener);
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private void getCurrentLocation(OnCompleteListener<Location> listener) {
+        LocationRequest locationRequest =
+                new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000).build();
+
+        LocationServices.getFusedLocationProviderClient(requireActivity())
+                .requestLocationUpdates(locationRequest, new LocationCallback() {
+                    @Override
+                    public void onLocationResult(@NonNull LocationResult locationResult) {
+                        super.onLocationResult(locationResult);
+                        LocationServices.getFusedLocationProviderClient(requireActivity()).removeLocationUpdates(this);
+                        if (!locationResult.getLocations().isEmpty()) {
+                            int latestLocationIndex = locationResult.getLocations().size() - 1;
+                            userLocation = locationResult.getLocations().get(latestLocationIndex);
+                            if (listener != null) {
+                                listener.onComplete(Tasks.forResult(userLocation));
+                            }
+                        } else {
+                            if (listener != null) {
+                                listener.onComplete(Tasks.forResult(null));
+                            }
+                        }
+                    }
+                }, Looper.getMainLooper());
+    }
+
+    private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+        // This uses the Haversine formula
+        double earthRadius = 6371; // Radius of the earth in km
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return earthRadius * c; // Distance in km
+    }
+
+    public interface FilterListener {
+        void onFilterStart();
+        void onFilterEnd();
     }
 }
