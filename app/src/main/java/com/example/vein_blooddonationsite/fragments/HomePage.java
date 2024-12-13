@@ -275,6 +275,7 @@ public class HomePage extends Fragment {
                 for (DonationSite site : fetchedSites) {
                     // Distance filter (if you want to use it)
                     if (userLocation != null) {
+                        Log.d("HomePage", userLocation.getLatitude() + " " + userLocation.getLongitude());
                         double distanceToSite = calculateDistance(
                                 userLocation.getLatitude(), userLocation.getLongitude(),
                                 site.getLatitude(), site.getLongitude()
@@ -283,6 +284,7 @@ public class HomePage extends Fragment {
                             continue;
                         }
                     }
+                    else Log.d("HomePage", "Co cai loz");
 
                     // Blood type filter
                     if (!bloodTypes.isEmpty() && !new HashSet<>(site.getNeededBloodTypes()).containsAll(bloodTypes)) {
@@ -353,10 +355,12 @@ public class HomePage extends Fragment {
                     @Override
                     public void onLocationResult(@NonNull LocationResult locationResult) {
                         super.onLocationResult(locationResult);
-                        LocationServices.getFusedLocationProviderClient(requireActivity()).removeLocationUpdates(this);
+                        LocationServices.getFusedLocationProviderClient(requireActivity())
+                                .removeLocationUpdates(this);
                         if (!locationResult.getLocations().isEmpty()) {
                             int latestLocationIndex = locationResult.getLocations().size() - 1;
                             userLocation = locationResult.getLocations().get(latestLocationIndex);
+                            Log.d("HomePage", "AAA" + userLocation.getLatitude() + " " + userLocation.getLongitude());
                             if (listener != null) {
                                 listener.onComplete(Tasks.forResult(userLocation));
                             }

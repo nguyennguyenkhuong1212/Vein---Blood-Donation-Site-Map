@@ -1,5 +1,6 @@
 package com.example.vein_blooddonationsite.activities;
 
+import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -37,9 +38,28 @@ public class FilterActivity extends AppCompatActivity {
         CheckBox checkboxB = findViewById(R.id.checkbox_b);
         CheckBox checkboxAB = findViewById(R.id.checkbox_ab);
         LinearLayout openDatePickerButton = findViewById(R.id.open_datepicker_button);
+        TextView filterDistance = findViewById(R.id.filter_distance);
         TextView eventDate = findViewById(R.id.filter_event_date);
         Button confirmButton = findViewById(R.id.filter_confirm_button);
         Button cancelButton = findViewById(R.id.filter_cancel_button);
+
+        distanceSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                filterDistance.setText(progress + " km");
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
 
         openDatePickerButton.setOnClickListener(v -> {
             final Calendar c = Calendar.getInstance();
