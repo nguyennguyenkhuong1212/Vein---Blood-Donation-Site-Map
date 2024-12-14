@@ -38,9 +38,9 @@ public class ProfilePage extends Fragment {
             // You might want to clear any SharedPreferences or local data related to the user.
 
             // 3. Navigate back to the login activity
-            Intent intent = new Intent(getActivity(), LogInActivity.class);
-            startActivity(intent);
-            requireActivity().finish(); // Finish the current activity
+//            Intent intent = new Intent(getActivity(), LogInActivity.class);
+//            startActivity(intent);
+//            requireActivity().finish(); // Finish the current activity
         });
 
         return view;
