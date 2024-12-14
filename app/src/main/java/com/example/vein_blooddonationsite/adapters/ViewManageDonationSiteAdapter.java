@@ -16,11 +16,11 @@ import com.example.vein_blooddonationsite.activities.ViewManageSiteActivity;
 import com.example.vein_blooddonationsite.models.DonationSite;
 import java.util.List;
 
-public class DonationSiteAdapter extends RecyclerView.Adapter<DonationSiteAdapter.ViewHolder> {
+public class ViewManageDonationSiteAdapter extends RecyclerView.Adapter<ViewManageDonationSiteAdapter.ViewHolder> {
 
     public List<DonationSite> donationSites;
 
-    public DonationSiteAdapter(List<DonationSite> donationSites) {
+    public ViewManageDonationSiteAdapter(List<DonationSite> donationSites) {
         this.donationSites = donationSites;
     }
 
@@ -40,8 +40,6 @@ public class DonationSiteAdapter extends RecyclerView.Adapter<DonationSiteAdapte
         holder.addressTextView.setText(site.getAddress());
         holder.contactNumberTextView.setText("Contact Number: " + site.getContactNumber());
         holder.operatingHoursTextView.setText("Operating Hours: " + site.getOperatingHours());
-        holder.neededBloodTypesTextView.setText(
-                "Needed Blood Types: " + String.join(", ", site.getNeededBloodTypes()));
 
         holder.editButton.setOnClickListener(v -> {
             Intent intent = new Intent(holder.itemView.getContext(), ViewManageSiteActivity.class);
@@ -76,7 +74,6 @@ public class DonationSiteAdapter extends RecyclerView.Adapter<DonationSiteAdapte
             addressTextView = itemView.findViewById(R.id.site_address);
             contactNumberTextView = itemView.findViewById(R.id.site_contact);
             operatingHoursTextView = itemView.findViewById(R.id.site_operating_hours);
-            neededBloodTypesTextView = itemView.findViewById(R.id.site_needed_blood_types);
             editButton = itemView.findViewById(R.id.edit_site_button);
             viewEventButton = itemView.findViewById(R.id.view_event_button);
             // ... find other TextViews from the item layout

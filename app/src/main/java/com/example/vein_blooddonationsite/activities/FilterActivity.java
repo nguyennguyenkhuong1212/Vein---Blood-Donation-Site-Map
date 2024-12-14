@@ -44,10 +44,15 @@ public class FilterActivity extends AppCompatActivity {
         Button cancelButton = findViewById(R.id.filter_cancel_button);
 
         distanceSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @SuppressLint("SetTextI18n")
+            @SuppressLint({"SetTextI18n", "DefaultLocale"})
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                filterDistance.setText(progress + " km");
+                if (progress  >= 10) {
+                    double progressInKm = progress / 10.0;
+                    filterDistance.setText(String.format("%.1f km", progressInKm));
+                } else {
+                    filterDistance.setText(progress * 100 + " m");
+                }
             }
 
             @Override
@@ -78,7 +83,7 @@ public class FilterActivity extends AppCompatActivity {
         });
 
         confirmButton.setOnClickListener(v -> {
-            int distance = distanceSeekBar.getProgress();
+            double distance = (double) distanceSeekBar.getProgress() * 100;
             ArrayList<String> bloodTypes = new ArrayList<>();
             if (checkboxO.isChecked()) {
                 bloodTypes.add("O");

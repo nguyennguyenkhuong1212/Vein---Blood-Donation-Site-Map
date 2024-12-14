@@ -43,7 +43,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Distance"
+            android:text="Distance:"
             android:textColor="@android:color/white"
             android:fontFamily="@font/instrumentsansbold"
             android:textSize="20sp"
@@ -60,6 +60,7 @@
             android:textColor="@android:color/white"
             android:fontFamily="@font/instrumentsans"
             android:textSize="20sp"
+            android:text="Unset"
             />
 
 
@@ -69,7 +70,7 @@
             android:id="@+id/distance_seekbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:max="50"
+            android:max="5000"
             android:progressBackgroundTint="@color/white"
             android:progressTint="@android:color/white"
             android:thumbTint="@android:color/white"
@@ -183,6 +184,7 @@
                     android:textColor="@android:color/white"
                     android:fontFamily="@font/instrumentsans"
                     android:textSize="20sp"
+                    android:text="Unset"
                     />
 
             </LinearLayout>

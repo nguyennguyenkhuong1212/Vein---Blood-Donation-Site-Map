@@ -13,10 +13,11 @@ public class Registration {
     private Date donationDate;
     private LocalTime donationTime;
     private String status;
+    private String role;
 
     public Registration() {}
 
-    public Registration(String registrationId, int userId, int siteId, int eventId, Date registrationDate, Date donationDate, LocalTime donationTime, String status) {
+    public Registration(String registrationId, int userId, int siteId, int eventId, Date registrationDate, Date donationDate, LocalTime donationTime, String status, String role) {
         this.registrationId = registrationId;
         this.userId = userId;
         this.siteId = siteId;
@@ -25,6 +26,7 @@ public class Registration {
         this.donationDate = donationDate;
         this.donationTime = donationTime;
         this.status = status;
+        this.role = role;
     }
 
     public String getRegistrationId() {
@@ -91,18 +93,27 @@ public class Registration {
         this.status = status;
     }
 
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
     @Override
     public String toString() {
-        return "Registration{" +
-                "registrationId='" + registrationId + '\'' +
+        return "\nRegistration{" +
+                "\nregistrationId='" + registrationId + '\'' +
                 "\nuserId=" + userId +
                 "\nsiteId=" + siteId +
                 "\neventId=" + eventId +
                 "\nregistrationDate=" + registrationDate +
                 "\ndonationDate=" + donationDate +
                 "\ndonationTime=" + donationTime +
-                "\nstatus='" + status + '\'' +
-                '}';
+                "\nstatus='" + status +
+                "\nrole='" + role +
+                "\n}";
     }
 }
 

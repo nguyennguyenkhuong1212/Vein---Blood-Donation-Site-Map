@@ -1,8 +1,12 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.VeinBloodDonationSite" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="android:statusBarColor" tools:targetApi = "1" tools:ignore="ObsoleteSdkInt">@color/primary</item>
-        <item name="android:navigationBarColor" tools:targetApi = "1" tools:ignore="ObsoleteSdkInt">@color/primary</item>
+        <item name="android:statusBarColor" tools:targetApi = "1" tools:ignore="ObsoleteSdkInt">
+            @color/primary
+        </item>
+        <item name="android:navigationBarColor" tools:targetApi = "1" tools:ignore="ObsoleteSdkInt">
+            @color/primary
+        </item>
     </style>
 
     <style name="Theme.VeinBloodDonationSite" parent="Base.Theme.VeinBloodDonationSite" />

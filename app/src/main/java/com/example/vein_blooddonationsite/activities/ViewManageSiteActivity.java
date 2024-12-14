@@ -38,10 +38,6 @@ public class ViewManageSiteActivity extends AppCompatActivity {
         EditText siteLngEditText = findViewById(R.id.view_manage_site_lng_edittext);
         EditText contactNumberEditText = findViewById(R.id.view_manage_site_contact_edittext);
         EditText operatingHoursEditText = findViewById(R.id.view_manage_site_hours_edittext);
-        CheckBox checkboxO = findViewById(R.id.view_manage_checkbox_o);
-        CheckBox checkboxA = findViewById(R.id.view_manage_checkbox_a);
-        CheckBox checkboxB = findViewById(R.id.view_manage_checkbox_b);
-        CheckBox checkboxAB = findViewById(R.id.view_manage_checkbox_ab);
         Button confirmButton = findViewById(R.id.view_manage_site_confirm_button);
         Button cancelButton = findViewById(R.id.view_manage_site_cancel_button);
 
@@ -52,13 +48,6 @@ public class ViewManageSiteActivity extends AppCompatActivity {
             siteLngEditText.setText(String.valueOf(site.getLongitude()));
             contactNumberEditText.setText(site.getContactNumber());
             operatingHoursEditText.setText(site.getOperatingHours());
-
-            // Set checkboxes based on neededBloodTypes
-            List<String> neededBloodTypes = site.getNeededBloodTypes();
-            checkboxO.setChecked(neededBloodTypes.contains("O"));
-            checkboxA.setChecked(neededBloodTypes.contains("A"));
-            checkboxB.setChecked(neededBloodTypes.contains("B"));
-            checkboxAB.setChecked(neededBloodTypes.contains("AB"));
 
             confirmButton.setOnClickListener(v -> {
                 // Get the updated values from EditTexts
@@ -112,21 +101,6 @@ public class ViewManageSiteActivity extends AppCompatActivity {
                 updatedLongitude = longitude[0];
                 Log.d("VSMP", latitude[0] + " " + String.valueOf(longitude[0]));
 
-                // Get updated blood types from checkboxes
-                List<String> updatedNeededBloodTypes = new ArrayList<>();
-                if (checkboxO.isChecked()) {
-                    updatedNeededBloodTypes.add("O");
-                }
-                if (checkboxA.isChecked()) {
-                    updatedNeededBloodTypes.add("A");
-                }
-                if (checkboxB.isChecked()) {
-                    updatedNeededBloodTypes.add("B");
-                }
-                if (checkboxAB.isChecked()) {
-                    updatedNeededBloodTypes.add("AB");
-                }
-
                 // Update the DonationSite object
                 site.setName(updatedSiteName);
                 site.setAddress(updatedSiteAddress);
@@ -134,7 +108,6 @@ public class ViewManageSiteActivity extends AppCompatActivity {
                 site.setLongitude(updatedLongitude);
                 site.setContactNumber(updatedContactNumber);
                 site.setOperatingHours(updatedOperatingHours);
-                site.setNeededBloodTypes(updatedNeededBloodTypes);
 
                 Log.d("VSMP", site.toString());
 

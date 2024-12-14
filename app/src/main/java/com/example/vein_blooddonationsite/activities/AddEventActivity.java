@@ -23,8 +23,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -46,6 +48,10 @@ public class AddEventActivity extends AppCompatActivity {
         CheckBox recurringCheckbox = findViewById(R.id.recurring_checkbox);
         Button addEventButton = findViewById(R.id.add_event_button);
         Button cancelButton = findViewById(R.id.add_event_cancel_button);
+        CheckBox checkbox_o = findViewById(R.id.checkbox_o);
+        CheckBox checkbox_a = findViewById(R.id.checkbox_a);
+        CheckBox checkbox_b = findViewById(R.id.checkbox_b);
+        CheckBox checkbox_ab = findViewById(R.id.checkbox_ab);
 
         DonationSite site = (DonationSite) getIntent().getSerializableExtra("site");
 
@@ -60,6 +66,20 @@ public class AddEventActivity extends AppCompatActivity {
                 String startTimeString = startTimeEditText.getText().toString().trim();
                 String endTimeString = endTimeEditText.getText().toString().trim();
                 boolean isRecurring = recurringCheckbox.isChecked();
+
+                List<String> neededBloodTypes = new ArrayList<>();
+                if (checkbox_o.isChecked()) {
+                    neededBloodTypes.add("O");
+                }
+                if (checkbox_a.isChecked()) {
+                    neededBloodTypes.add("A");
+                }
+                if (checkbox_b.isChecked()) {
+                    neededBloodTypes.add("B");
+                }
+                if (checkbox_ab.isChecked()) {
+                    neededBloodTypes.add("AB");
+                }
 
                 if (!dateString.matches("^(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/[0-9]{4}$")) {
                     Toast.makeText(AddEventActivity.this, "Invalid date format. Please use dd/MM/yyyy", Toast.LENGTH_SHORT).show();
@@ -116,7 +136,8 @@ public class AddEventActivity extends AppCompatActivity {
                                     eventDate,
                                     startTimeMap,
                                     endTimeMap,
-                                    isRecurring
+                                    isRecurring,
+                                    neededBloodTypes
                             );
 
                             db.collection("events")

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:background="@drawable/item_in_manage_site_list"
     android:padding="16dp"
@@ -44,6 +44,90 @@
         android:fontFamily="@font/instrumentsans"
         android:textColor="@color/white"
         />
+
+    <TextView
+        android:id="@+id/event_needed_blood_types_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Needed Blood Types"
+        android:fontFamily="@font/instrumentsans"
+        android:textColor="@color/white"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:layout_weight="1"
+        android:id="@+id/register_role_buttons"
+        android:visibility="gone"
+        >
+
+        <LinearLayout
+            android:layout_width="155dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:background="@drawable/view_manage_site_button"
+            android:paddingVertical="7dp"
+            android:id="@+id/register_role_donor"
+            android:visibility="gone"
+            >
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/baseline_blood_24"
+                app:tint="@color/white" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Join to Donate!"
+                android:textColor="@color/white"
+                android:fontFamily="@font/instrumentsansbold"
+                android:textSize="12sp"
+                android:layout_marginStart="8dp"
+                />
+
+        </LinearLayout>
+
+        <Space
+            android:layout_width="10dp"
+            android:layout_height="0dp"/>
+
+        <LinearLayout
+            android:layout_width="155dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:background="@drawable/view_manage_site_button"
+            android:paddingVertical="7dp"
+            android:id="@+id/register_role_volunteer"
+            android:visibility="gone"
+            >
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/baseline_volunteer_activism_24"
+                app:tint="@color/white" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Join as Volunteer!"
+                android:textColor="@color/white"
+                android:fontFamily="@font/instrumentsansbold"
+                android:textSize="12sp"
+                android:layout_marginStart="8dp"
+                />
+
+        </LinearLayout>
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/event_recurring_textview"

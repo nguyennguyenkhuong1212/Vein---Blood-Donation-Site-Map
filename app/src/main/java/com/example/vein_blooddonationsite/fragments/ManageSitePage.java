@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 import com.example.vein_blooddonationsite.R;
 import com.example.vein_blooddonationsite.activities.AddSiteActivity;
-import com.example.vein_blooddonationsite.adapters.DonationSiteAdapter;
+import com.example.vein_blooddonationsite.adapters.ViewManageDonationSiteAdapter;
 import com.example.vein_blooddonationsite.models.DonationSite;
 import com.example.vein_blooddonationsite.models.User;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -30,7 +30,7 @@ import java.util.Objects;
 public class ManageSitePage extends Fragment {
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private DonationSiteAdapter adapter;
+    private ViewManageDonationSiteAdapter adapter;
     TextView manageSiteTitle;
     TextView manageSiteInformSiteAdmin;
     TextView manageSiteInform;
@@ -41,7 +41,7 @@ public class ManageSitePage extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_manage_site, container, false);
         // Inflate the layout for this fragment
-        adapter = new DonationSiteAdapter(new ArrayList<>());
+        adapter = new ViewManageDonationSiteAdapter(new ArrayList<>());
         FloatingActionButton addSiteBtn = view.findViewById(R.id.add_site_button);
         assert getArguments() != null;
         User currentUser = (User) getArguments().getSerializable("user");
@@ -94,11 +94,10 @@ public class ManageSitePage extends Fragment {
                     double longitude = ((Double) data.get("longitude")).doubleValue();
                     String contactNumber = (String) data.get("contactNumber");
                     String operatingHours = (String) data.get("operatingHours");
-                    List<String> neededBloodTypes = (List<String>) data.get("neededBloodTypes");
                     List<Integer> followerIds = (List<Integer>) data.get("followerIds");
 
                     DonationSite site = new DonationSite(siteId, name, address, latitude, longitude,
-                            contactNumber, operatingHours, neededBloodTypes, adminId, followerIds);
+                            contactNumber, operatingHours, adminId, followerIds);
                     if (currentUser.getUserId() == adminId) {
                         sites.add(site);
                         Log.d("MSP", currentUser.toString());

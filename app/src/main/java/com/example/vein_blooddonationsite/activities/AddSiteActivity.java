@@ -43,10 +43,6 @@ public class AddSiteActivity extends AppCompatActivity {
         EditText siteLngEditText = findViewById(R.id.add_site_lng_edittext);
         EditText contactNumberEditText = findViewById(R.id.add_site_contact_edittext);
         EditText operatingHoursEditText = findViewById(R.id.add_site_hours_edittext);
-        CheckBox checkbox_o = findViewById(R.id.checkbox_o);
-        CheckBox checkbox_a = findViewById(R.id.checkbox_a);
-        CheckBox checkbox_b = findViewById(R.id.checkbox_b);
-        CheckBox checkbox_ab = findViewById(R.id.checkbox_ab);
         Button addSiteConfirmButton = findViewById(R.id.add_site_confirm_button);
         Button cancelButton = findViewById(R.id.add_site_cancel_button);
 
@@ -89,21 +85,6 @@ public class AddSiteActivity extends AppCompatActivity {
                 }
             }
 
-            // Get needed blood types from checkboxes
-            List<String> neededBloodTypes = new ArrayList<>();
-            if (checkbox_o.isChecked()) {
-                neededBloodTypes.add("O");
-            }
-            if (checkbox_a.isChecked()) {
-                neededBloodTypes.add("A");
-            }
-            if (checkbox_b.isChecked()) {
-                neededBloodTypes.add("B");
-            }
-            if (checkbox_ab.isChecked()) {
-                neededBloodTypes.add("AB");
-            }
-
             if (!operatingHours.matches("^([0-1]?[0-9]|2[0-3]):[0-5][0-9] - ([0-1]?[0-9]|2[0-3]):[0-5][0-9]$")) {
                 Toast.makeText(AddSiteActivity.this, "Invalid operating hours format", Toast.LENGTH_SHORT).show();
                 return;
@@ -122,7 +103,6 @@ public class AddSiteActivity extends AppCompatActivity {
                             longitude[0],
                             contactNumber,
                             operatingHours,
-                            neededBloodTypes,
                             currentUser.getUserId(),
                             new ArrayList<>());
 

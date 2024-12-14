@@ -16,7 +16,6 @@ public class DonationSite implements Serializable {
     private double longitude;
     private String contactNumber;
     private String operatingHours;
-    private List<String> neededBloodTypes;
     private int adminId;
     private List<Integer> followerIds;
 
@@ -24,8 +23,7 @@ public class DonationSite implements Serializable {
     }
 
     public DonationSite(int siteId, String name, String address, double latitude, double longitude,
-                        String contactInfo, String operatingHours, List<String> neededBloodTypes,
-                        int adminId, List<Integer> followerIds) {
+                        String contactInfo, String operatingHours, int adminId, List<Integer> followerIds) {
         this.siteId = siteId;
         this.name = name;
         this.address = address;
@@ -33,7 +31,6 @@ public class DonationSite implements Serializable {
         this.longitude = longitude;
         this.contactNumber = contactInfo;
         this.operatingHours = operatingHours;
-        this.neededBloodTypes = neededBloodTypes;
         this.adminId = adminId;
         this.followerIds = followerIds;
     }
@@ -94,14 +91,6 @@ public class DonationSite implements Serializable {
         this.operatingHours = operatingHours;
     }
 
-    public List<String> getNeededBloodTypes() {
-        return neededBloodTypes;
-    }
-
-    public void setNeededBloodTypes(List<String> neededBloodTypes) {
-        this.neededBloodTypes = neededBloodTypes;
-    }
-
     public int getAdminId() {
         return adminId;
     }
@@ -139,7 +128,6 @@ public class DonationSite implements Serializable {
                 "\nlongitude=" + longitude +
                 "\ncontactInfo='" + contactNumber + '\'' +
                 "\noperatingHours='" + operatingHours + '\'' +
-                "\nneededBloodTypes=" + neededBloodTypes +
                 "\nadminId='" + adminId + '\'' +
                 "\nfollowerIds=" + followerIds +
                 '}';

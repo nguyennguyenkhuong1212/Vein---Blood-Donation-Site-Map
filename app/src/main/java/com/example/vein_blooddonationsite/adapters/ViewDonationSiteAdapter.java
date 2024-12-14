@@ -22,6 +22,7 @@ public class ViewDonationSiteAdapter extends RecyclerView.Adapter<ViewDonationSi
 
     public List<DonationSite> donationSites;
     public List<User> users;
+    public User currentUser;
 
     public ViewDonationSiteAdapter(List<DonationSite> donationSites, List<User> users) { // Modify constructor
         this.donationSites = donationSites;
@@ -58,11 +59,10 @@ public class ViewDonationSiteAdapter extends RecyclerView.Adapter<ViewDonationSi
 
         holder.contactNumberTextView.setText("Contact Number: " + site.getContactNumber());
         holder.operatingHoursTextView.setText("Operating Hours: " + site.getOperatingHours());
-        holder.neededBloodTypesTextView.setText(
-                "Needed Blood Types: " + String.join(", ", site.getNeededBloodTypes()));
 
         holder.viewEventButton.setOnClickListener(v -> {
             Intent intent = new Intent(holder.itemView.getContext(), ViewEventActivity.class);
+            intent.putExtra("currentUser", currentUser);
             intent.putExtra("site", site);
             holder.itemView.getContext().startActivity(intent);
         });
@@ -79,7 +79,6 @@ public class ViewDonationSiteAdapter extends RecyclerView.Adapter<ViewDonationSi
         public TextView adminTextView;
         public TextView contactNumberTextView;
         public TextView operatingHoursTextView;
-        public TextView neededBloodTypesTextView;
         public LinearLayout viewEventButton;
 
         public ViewHolder(View itemView) {
@@ -89,7 +88,6 @@ public class ViewDonationSiteAdapter extends RecyclerView.Adapter<ViewDonationSi
             adminTextView = itemView.findViewById(R.id.view_site_admin);
             contactNumberTextView = itemView.findViewById(R.id.view_site_contact);
             operatingHoursTextView = itemView.findViewById(R.id.view_site_operating_hours);
-            neededBloodTypesTextView = itemView.findViewById(R.id.view_site_needed_blood_types);
             viewEventButton = itemView.findViewById(R.id.view_site_view_event_button);
         }
     }

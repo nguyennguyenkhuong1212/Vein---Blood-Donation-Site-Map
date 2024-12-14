@@ -7,17 +7,27 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
 import com.example.vein_blooddonationsite.R;
 import com.example.vein_blooddonationsite.activities.LogInActivity;
+import com.example.vein_blooddonationsite.models.User;
 
 public class ProfilePage extends Fragment {
+    public User currentUser;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
+
+        assert getArguments() != null;
+        currentUser = (User) getArguments().getSerializable("user");
+
+        TextView userName = view.findViewById(R.id.profile_user_name);
+
+        userName.setText(currentUser.getName());
 
         Button logoutButton = view.findViewById(R.id.logout_button);
         logoutButton.setOnClickListener(v -> {

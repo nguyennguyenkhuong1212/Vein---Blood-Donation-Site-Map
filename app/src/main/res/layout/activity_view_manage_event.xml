@@ -57,7 +57,7 @@
         android:paddingHorizontal="36dp"
         android:textSize="20sp"
         android:textColor="@color/primary"
-        android:text="No donation sites found.\nTap the '+' button to create one."
+        android:text="No events found.\nTap the '+' button to create one."
         android:gravity="center"
         android:id="@+id/manage_event_empty_inform"
         android:visibility="gone"

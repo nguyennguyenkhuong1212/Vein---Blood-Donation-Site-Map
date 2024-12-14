@@ -13,9 +13,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.vein_blooddonationsite.R;
-import com.example.vein_blooddonationsite.adapters.DonationSiteEventAdapter;
+import com.example.vein_blooddonationsite.adapters.ViewDonationSiteEventAdapter;
 import com.example.vein_blooddonationsite.models.DonationSite;
 import com.example.vein_blooddonationsite.models.DonationSiteEvent;
+import com.example.vein_blooddonationsite.models.User;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -23,6 +24,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ViewEventActivity extends AppCompatActivity {
 
@@ -32,14 +34,15 @@ public class ViewEventActivity extends AppCompatActivity {
     ImageButton backButton;
     TextView manageEventEmptyInform;
     DonationSite site;
-    DonationSiteEventAdapter adapter;
+    User currentUser;
+    ViewDonationSiteEventAdapter adapter;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_event);
-        adapter = new DonationSiteEventAdapter(new ArrayList<>());
+        adapter = new ViewDonationSiteEventAdapter(new ArrayList<>());
 
         siteNameTextView = findViewById(R.id.view_event_site_name_textview);
         eventsRecyclerView = findViewById(R.id.view_event_events_recycler_view);
@@ -47,6 +50,7 @@ public class ViewEventActivity extends AppCompatActivity {
         backButton = findViewById(R.id.view_event_back_button);
         manageEventEmptyInform = findViewById(R.id.view_event_manage_event_empty_inform);
         site = (DonationSite) getIntent().getSerializableExtra("site");
+        currentUser = (User) getIntent().getSerializableExtra("currentUser");
 
         backButton.setOnClickListener(v -> {
             finish();
@@ -91,6 +95,8 @@ public class ViewEventActivity extends AppCompatActivity {
                         eventsRecyclerView.setVisibility(View.VISIBLE);
                         manageEventEmptyInform.setVisibility(View.GONE);
                         adapter.events = events;
+                        adapter.currentUser = currentUser;
+                        adapter.currentSite = site;
                         adapter.notifyDataSetChanged();
                     }
                 });

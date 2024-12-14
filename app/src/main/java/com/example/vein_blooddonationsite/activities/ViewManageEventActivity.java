@@ -11,12 +11,10 @@ import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.vein_blooddonationsite.R;
-import com.example.vein_blooddonationsite.adapters.DonationSiteAdapter;
-import com.example.vein_blooddonationsite.adapters.DonationSiteEventAdapter; // Create this adapter
+import com.example.vein_blooddonationsite.adapters.ViewManageDonationSiteEventAdapter; // Create this adapter
 import com.example.vein_blooddonationsite.models.DonationSite;
 import com.example.vein_blooddonationsite.models.DonationSiteEvent;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -37,14 +35,14 @@ public class ViewManageEventActivity extends AppCompatActivity {
     TextView manageEventEmptyInform;
     FloatingActionButton addEventBtn;
     DonationSite site;
-    DonationSiteEventAdapter adapter;
+    ViewManageDonationSiteEventAdapter adapter;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_manage_event);
-        adapter = new DonationSiteEventAdapter(new ArrayList<>());
+        adapter = new ViewManageDonationSiteEventAdapter(new ArrayList<>());
 
         siteNameTextView = findViewById(R.id.site_name_textview);
         eventsRecyclerView = findViewById(R.id.events_recycler_view);

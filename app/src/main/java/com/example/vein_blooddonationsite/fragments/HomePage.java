@@ -43,11 +43,13 @@ import com.example.vein_blooddonationsite.adapters.ViewDonationSiteAdapter;
 import com.example.vein_blooddonationsite.models.DonationSite;
 import com.example.vein_blooddonationsite.models.DonationSiteEvent;
 import com.example.vein_blooddonationsite.models.User;
+import com.google.android.gms.location.LocationAvailability;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
+import com.google.android.gms.tasks.CancellationTokenSource;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -59,6 +61,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -79,6 +82,8 @@ public class HomePage extends Fragment {
     List<DonationSiteEvent> events = new ArrayList<>();
     private ProgressBar loadingSpinner;
     private View overlay;
+    User currentUser;
+
     @SuppressLint("SimpleDateFormat")
     private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -87,12 +92,12 @@ public class HomePage extends Fragment {
             result -> {
                 if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
                     Intent data = result.getData();
-                    int distance = data.getIntExtra("distance", 0);
+                    double distance = data.getDoubleExtra("distance", 0);
                     ArrayList<String> bloodTypes = data.getStringArrayListExtra("bloodTypes");
                     String eventDate = data.getStringExtra("eventDate");
                     assert eventDate != null;
                     showLoading();
-                    fetchFilteredDonationSites(distance, bloodTypes, eventDate);
+                    fetchFilteredDonationSites(distance / 1000, bloodTypes, eventDate);
                     hideLoading();
                 }
             });
@@ -116,6 +121,8 @@ public class HomePage extends Fragment {
         emptyInform = view.findViewById(R.id.view_all_donation_sites_empty_inform);
         loadingSpinner = view.findViewById(R.id.loading_spinner);
         overlay = view.findViewById(R.id.loading_spinner_overlay);
+        assert getArguments() != null;
+        currentUser = (User) getArguments().getSerializable("user");
 
         ImageButton filterButton = view.findViewById(R.id.filter_button);
 
@@ -127,6 +134,13 @@ public class HomePage extends Fragment {
         adapter = new ViewDonationSiteAdapter(new ArrayList<>(), new ArrayList<>());
         viewDonationSitesRecyclerView = view.findViewById(R.id.view_all_donation_sites_recycler_view);
         viewDonationSitesRecyclerView.setAdapter(adapter);
+
+        getLocation(task -> {
+            if (!task.isSuccessful()) {
+                Log.e("HomePage", "Error getting location", task.getException());
+                throw new RuntimeException("Failed to get location", task.getException());
+            }
+        });
 
         fetchAllDonationSites();
 
@@ -165,11 +179,10 @@ public class HomePage extends Fragment {
                                         double longitude = ((Double) data.get("longitude")).doubleValue();
                                         String contactNumber = (String) data.get("contactNumber");
                                         String operatingHours = (String) data.get("operatingHours");
-                                        List<String> neededBloodTypes = (List<String>) data.get("neededBloodTypes");
                                         List<Integer> followerIds = (List<Integer>) data.get("followerIds");
 
                                         DonationSite site = new DonationSite(siteId, name, address, latitude, longitude,
-                                                contactNumber, operatingHours, neededBloodTypes, adminId, followerIds);
+                                                contactNumber, operatingHours, adminId, followerIds);
                                         sites.add(site);
                                     } catch (ClassCastException | NullPointerException e) {
                                         Log.e("ManageSitePage", "Error parsing document data: " + e.getMessage());
@@ -186,6 +199,7 @@ public class HomePage extends Fragment {
                                     viewDonationSitesRecyclerView.setVisibility(View.VISIBLE);
                                     adapter.donationSites = sites;
                                     adapter.users = users;
+                                    adapter.currentUser = currentUser;
                                     adapter.notifyDataSetChanged();
                                 }
                             });
@@ -236,7 +250,7 @@ public class HomePage extends Fragment {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @SuppressLint("NotifyDataSetChanged")
-    private void fetchFilteredDonationSites(int distance, List<String> bloodTypes, String eventDateString) {
+    private void fetchFilteredDonationSites(double distance, List<String> bloodTypes, String eventDateString) {
         showLoading();
 
         new Thread(() -> {
@@ -272,34 +286,48 @@ public class HomePage extends Fragment {
                 // Convert eventDateString to Date object
                 Date eventDate = getDate(eventDateString);
 
+                Log.d("HomePage", "Distance: " + distance);
+
                 for (DonationSite site : fetchedSites) {
+                    boolean matchedFilter = true;
                     // Distance filter (if you want to use it)
-                    if (userLocation != null) {
-                        Log.d("HomePage", userLocation.getLatitude() + " " + userLocation.getLongitude());
-                        double distanceToSite = calculateDistance(
-                                userLocation.getLatitude(), userLocation.getLongitude(),
-                                site.getLatitude(), site.getLongitude()
-                        );
-                        if (distanceToSite > distance) {
-                            continue;
+                    if (distance != 0) {
+                        if (userLocation != null) {
+                            Log.d("HomePage", userLocation.getLatitude() + " " + userLocation.getLongitude());
+                            double distanceToSite = calculateDistance(
+                                    userLocation.getLatitude(), userLocation.getLongitude(),
+                                    site.getLatitude(), site.getLongitude()
+                            );
+                            if (distanceToSite > distance) {
+                                Log.d("homePage 291", distanceToSite + " " + distance);
+                                continue;
+                            }
+                        }
+                        else {
+                            Log.d("HomePage", "Cannot get user location");
+                            throw new RuntimeException("Failed to get location");
                         }
                     }
-                    else Log.d("HomePage", "Co cai loz");
 
                     // Blood type filter
-                    if (!bloodTypes.isEmpty() && !new HashSet<>(site.getNeededBloodTypes()).containsAll(bloodTypes)) {
-                        continue;
-                    }
+//                    if (!bloodTypes.isEmpty() && Collections.disjoint(new HashSet<>(site.getNeededBloodTypes()), bloodTypes)) {
+//                        continue;
+//                    }
 
                     // Event date filter
                     if (eventDate != null) {
+                        boolean valid = false;
                         for (DonationSiteEvent event : site.getEvents(events)) {
                             if (sdf.format(event.getEventDate()).equals(sdf.format(eventDate))) {
-                                filteredSites.add(site);
+                                valid = true;
                                 break;
                             }
                         }
+                        if (!valid) {
+                            matchedFilter = false;
+                        }
                     }
+                    if (matchedFilter) filteredSites.add(site);
                 }
 
                 requireActivity().runOnUiThread(() -> {
@@ -310,6 +338,7 @@ public class HomePage extends Fragment {
                     } else {
                         Log.d("HomePage", filteredSites.toString());
                         viewDonationSitesRecyclerView.setVisibility(View.VISIBLE);
+                        emptyInform.setVisibility(View.GONE);
                         adapter.donationSites = filteredSites;
                         adapter.users = users;
                         adapter.notifyDataSetChanged();
@@ -324,6 +353,7 @@ public class HomePage extends Fragment {
     }
 
     private static @Nullable Date getDate(String eventDateString) {
+        if (eventDateString.equals("Unset")) return null;
         Date eventDate = null;
         if (!eventDateString.isEmpty()) {
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
@@ -347,30 +377,22 @@ public class HomePage extends Fragment {
 
     @SuppressLint("MissingPermission")
     private void getCurrentLocation(OnCompleteListener<Location> listener) {
-        LocationRequest locationRequest =
-                new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000).build();
-
         LocationServices.getFusedLocationProviderClient(requireActivity())
-                .requestLocationUpdates(locationRequest, new LocationCallback() {
-                    @Override
-                    public void onLocationResult(@NonNull LocationResult locationResult) {
-                        super.onLocationResult(locationResult);
-                        LocationServices.getFusedLocationProviderClient(requireActivity())
-                                .removeLocationUpdates(this);
-                        if (!locationResult.getLocations().isEmpty()) {
-                            int latestLocationIndex = locationResult.getLocations().size() - 1;
-                            userLocation = locationResult.getLocations().get(latestLocationIndex);
-                            Log.d("HomePage", "AAA" + userLocation.getLatitude() + " " + userLocation.getLongitude());
-                            if (listener != null) {
-                                listener.onComplete(Tasks.forResult(userLocation));
-                            }
-                        } else {
-                            if (listener != null) {
-                                listener.onComplete(Tasks.forResult(null));
-                            }
+                .getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, new CancellationTokenSource().getToken())
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        userLocation = task.getResult();
+                        Log.d("HomePage", "Lat: " + userLocation.getLatitude() + " Lng: " + userLocation.getLongitude());
+                        if (listener != null) {
+                            listener.onComplete(Tasks.forResult(userLocation));
+                        }
+                    } else {
+                        Log.d("HomePage", "Unable to get last location");
+                        if (listener != null) {
+                            listener.onComplete(Tasks.forResult(null));
                         }
                     }
-                }, Looper.getMainLooper());
+                });
     }
 
     private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
@@ -383,10 +405,5 @@ public class HomePage extends Fragment {
                         Math.sin(dLon / 2) * Math.sin(dLon / 2);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return earthRadius * c; // Distance in km
-    }
-
-    public interface FilterListener {
-        void onFilterStart();
-        void onFilterEnd();
     }
 }
