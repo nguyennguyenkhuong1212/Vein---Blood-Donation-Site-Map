@@ -66,15 +66,46 @@
 
         </LinearLayout>
 
-        <SeekBar
-            android:id="@+id/distance_seekbar"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:max="5000"
-            android:progressBackgroundTint="@color/white"
-            android:progressTint="@android:color/white"
-            android:thumbTint="@android:color/white"
-            android:layout_marginBottom="16dp"/>
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="6dp">
+
+            <Button
+                android:id="@+id/decrease_distance_button"
+                android:layout_width="15dp"
+                android:layout_height="wrap_content"
+                android:text="–"
+                android:padding="0dp"
+                android:textSize="28sp"
+                android:layout_marginTop="-1.25dp"
+                android:backgroundTint="@color/transparent"
+                android:textColor="@color/white" />
+
+            <SeekBar
+                android:id="@+id/distance_seekbar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:max="150"
+                android:progressBackgroundTint="@color/white"
+                android:progressTint="@android:color/white"
+                android:thumbTint="@android:color/white" />
+
+            <Button
+                android:id="@+id/increase_distance_button"
+                android:layout_width="15dp"
+                android:layout_height="wrap_content"
+                android:textSize="28sp"
+                android:padding="0dp"
+                android:text="+"
+                android:layout_marginTop="-1.75dp"
+                android:backgroundTint="@color/transparent"
+                android:textColor="@color/white" />
+
+        </LinearLayout>
 
         <TextView
             android:layout_width="wrap_content"

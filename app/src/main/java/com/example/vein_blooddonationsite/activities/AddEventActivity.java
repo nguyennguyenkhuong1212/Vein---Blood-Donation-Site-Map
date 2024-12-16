@@ -112,6 +112,19 @@ public class AddEventActivity extends AppCompatActivity {
                         return;
                     }
 
+                    if (site.getOperatingHours().split(" - ").length != 2) {
+                        throw new IllegalArgumentException("Invalid operating hours format. Expected format: HH:mm - HH:mm");
+                    }
+
+                    // Parse the start and end times
+                    LocalTime operatingStartTime = LocalTime.parse(site.getOperatingHours().split(" - ")[0], timeFormatter);
+                    LocalTime operatingEndTime = LocalTime.parse(site.getOperatingHours().split(" - ")[1], timeFormatter);
+
+                    if (startTime.isBefore(operatingStartTime) || endTime.isAfter(operatingEndTime)){
+                        Toast.makeText(AddEventActivity.this, "The scheduling of blood donation events must align with the site's operating hours.", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
                     getNewEventId(task -> {
                         if (task.isSuccessful()) {
                             int newEventId = task.getResult();

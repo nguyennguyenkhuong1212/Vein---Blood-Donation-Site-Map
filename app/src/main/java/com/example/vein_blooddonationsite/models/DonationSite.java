@@ -5,7 +5,9 @@ import androidx.annotation.NonNull;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class DonationSite implements Serializable {
 
@@ -115,6 +117,15 @@ public class DonationSite implements Serializable {
             }
         }
         return siteEvents;
+    }
+
+    public List<String> getNeededBloodTypes(List<DonationSiteEvent> allEvents){
+        List<DonationSiteEvent> siteEvents = getEvents(allEvents);
+        Set<String> neededBloodTypes = new HashSet<>();
+        for (DonationSiteEvent event : siteEvents) {
+            neededBloodTypes.addAll(event.getNeededBloodTypes());
+        }
+        return new ArrayList<>(neededBloodTypes);
     }
 
     @NonNull

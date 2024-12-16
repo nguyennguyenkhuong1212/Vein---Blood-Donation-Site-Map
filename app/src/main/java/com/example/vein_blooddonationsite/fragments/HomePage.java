@@ -97,7 +97,7 @@ public class HomePage extends Fragment {
                     String eventDate = data.getStringExtra("eventDate");
                     assert eventDate != null;
                     showLoading();
-                    fetchFilteredDonationSites(distance / 1000, bloodTypes, eventDate);
+                    fetchFilteredDonationSites(distance / 5, bloodTypes, eventDate);
                     hideLoading();
                 }
             });
@@ -298,6 +298,7 @@ public class HomePage extends Fragment {
                                     userLocation.getLatitude(), userLocation.getLongitude(),
                                     site.getLatitude(), site.getLongitude()
                             );
+                            Log.d("Hahaha", distanceToSite + " " + distance);
                             if (distanceToSite > distance) {
                                 Log.d("homePage 291", distanceToSite + " " + distance);
                                 continue;
@@ -310,9 +311,9 @@ public class HomePage extends Fragment {
                     }
 
                     // Blood type filter
-//                    if (!bloodTypes.isEmpty() && Collections.disjoint(new HashSet<>(site.getNeededBloodTypes()), bloodTypes)) {
-//                        continue;
-//                    }
+                    if (!bloodTypes.isEmpty() && Collections.disjoint(new HashSet<>(site.getNeededBloodTypes(events)), bloodTypes)) {
+                        continue;
+                    }
 
                     // Event date filter
                     if (eventDate != null) {

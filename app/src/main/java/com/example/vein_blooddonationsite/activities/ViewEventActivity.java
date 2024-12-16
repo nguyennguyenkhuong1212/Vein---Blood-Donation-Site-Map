@@ -16,6 +16,7 @@ import com.example.vein_blooddonationsite.R;
 import com.example.vein_blooddonationsite.adapters.ViewDonationSiteEventAdapter;
 import com.example.vein_blooddonationsite.models.DonationSite;
 import com.example.vein_blooddonationsite.models.DonationSiteEvent;
+import com.example.vein_blooddonationsite.models.Registration;
 import com.example.vein_blooddonationsite.models.User;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -36,6 +37,7 @@ public class ViewEventActivity extends AppCompatActivity {
     DonationSite site;
     User currentUser;
     ViewDonationSiteEventAdapter adapter;
+    List<Registration> registrations = new ArrayList<>();
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -58,6 +60,7 @@ public class ViewEventActivity extends AppCompatActivity {
 
         if (site != null) {
             siteNameTextView.setText(site.getName());
+            fetchAllRegistrations();
             fetchEvents(site);
         }
     }
@@ -65,11 +68,10 @@ public class ViewEventActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.O)
     @SuppressLint("NotifyDataSetChanged")
     private void fetchEvents(DonationSite site) {
-        Log.d("VMEA", String.valueOf(site.getSiteId()));
         db.collection("events").whereEqualTo("siteId", site.getSiteId())
                 .addSnapshotListener((response, error) -> {
                     if (error != null) {
-                        Log.w("ViewSiteEvents", "Listen failed.", error);
+                        Log.w("VEA", "Listen failed.", error);
                         return;
                     }
 
@@ -97,8 +99,25 @@ public class ViewEventActivity extends AppCompatActivity {
                         adapter.events = events;
                         adapter.currentUser = currentUser;
                         adapter.currentSite = site;
+                        adapter.registrations = registrations;
                         adapter.notifyDataSetChanged();
                     }
                 });
+    }
+
+    public void fetchAllRegistrations() {
+        db.collection("registrations")
+            .addSnapshotListener((response, error) -> {
+                if (error != null) {
+                    Log.w("VEA", "Listen failed (GET registrations).", error);
+                    return;
+                }
+
+                assert response != null;
+                for (QueryDocumentSnapshot document : response) {
+                    Registration registration = document.toObject(Registration.class);
+                    registrations.add(registration);
+                }
+            });
     }
 }

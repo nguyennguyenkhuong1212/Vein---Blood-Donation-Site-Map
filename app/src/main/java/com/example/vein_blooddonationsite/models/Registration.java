@@ -2,22 +2,32 @@ package com.example.vein_blooddonationsite.models;
 
 import java.time.LocalTime;
 import java.util.Date;
+import java.util.Map;
 
 public class Registration {
 
-    private String registrationId;
+    private int registrationId;
     private int userId;
     private int siteId;
     private int eventId;
     private Date registrationDate;
     private Date donationDate;
-    private LocalTime donationTime;
-    private String status;
-    private String role;
+    private Map<String, Integer> donationTime;
+    private String status; // "COMPLETED", "PENDING", "APPROVED"
+    // "COMPLETED": For user who already donate blood
+    // "PENDING": For user who waits for approval from the site manager
+    // "APPROVED": For user who already got approval
+
+    private String role; // "DONOR", "MANAGER", "VOLUNTEER"
+    // "DONOR": For user who goes to an event as a donor
+    // "MANAGER": For site admin only, when they create an event, they will be registered as MANAGER,
+    // and they need to be in person in each of their event
+    // "VOLUNTEER": For other site admin who wants to work as a volunteer at the site not their own
+
 
     public Registration() {}
 
-    public Registration(String registrationId, int userId, int siteId, int eventId, Date registrationDate, Date donationDate, LocalTime donationTime, String status, String role) {
+    public Registration(int registrationId, int userId, int siteId, int eventId, Date registrationDate, Date donationDate, Map<String, Integer> donationTime, String status, String role) {
         this.registrationId = registrationId;
         this.userId = userId;
         this.siteId = siteId;
@@ -29,11 +39,11 @@ public class Registration {
         this.role = role;
     }
 
-    public String getRegistrationId() {
+    public int getRegistrationId() {
         return registrationId;
     }
 
-    public void setRegistrationId(String registrationId) {
+    public void setRegistrationId(int registrationId) {
         this.registrationId = registrationId;
     }
 
@@ -77,11 +87,11 @@ public class Registration {
         this.donationDate = donationDate;
     }
 
-    public LocalTime getDonationTime() {
+    public Map<String, Integer> getDonationTime() {
         return donationTime;
     }
 
-    public void setDonationTime(LocalTime donationTime) {
+    public void setDonationTime(Map<String, Integer> donationTime) {
         this.donationTime = donationTime;
     }
 

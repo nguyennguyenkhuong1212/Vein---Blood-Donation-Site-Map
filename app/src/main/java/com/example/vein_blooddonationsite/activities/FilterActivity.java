@@ -42,16 +42,32 @@ public class FilterActivity extends AppCompatActivity {
         TextView eventDate = findViewById(R.id.filter_event_date);
         Button confirmButton = findViewById(R.id.filter_confirm_button);
         Button cancelButton = findViewById(R.id.filter_cancel_button);
+        Button decreaseButton = findViewById(R.id.decrease_distance_button);
+        Button increaseButton = findViewById(R.id.increase_distance_button);
+
+        decreaseButton.setOnClickListener(v -> {
+            int currentProgress = distanceSeekBar.getProgress();
+            if (currentProgress > 0) {
+                distanceSeekBar.setProgress(currentProgress - 1);
+            }
+        });
+
+        increaseButton.setOnClickListener(v -> {
+            int currentProgress = distanceSeekBar.getProgress();
+            if (currentProgress < distanceSeekBar.getMax()) {
+                distanceSeekBar.setProgress(currentProgress + 1);
+            }
+        });
 
         distanceSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @SuppressLint({"SetTextI18n", "DefaultLocale"})
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (progress  >= 10) {
-                    double progressInKm = progress / 10.0;
+                if (progress  >= 5) {
+                    double progressInKm = (double) progress / (double) 5;
                     filterDistance.setText(String.format("%.1f km", progressInKm));
                 } else {
-                    filterDistance.setText(progress * 100 + " m");
+                    filterDistance.setText(progress * 200 + " m");
                 }
             }
 
@@ -74,6 +90,7 @@ public class FilterActivity extends AppCompatActivity {
 
             DatePickerDialog datePickerDialog = new DatePickerDialog(
                     this,
+                    R.style.MyDateTimePickerDialogTheme,
                     (view, year1, monthOfYear, dayOfMonth) -> {
                         String selectedDate = dayOfMonth + "/" + (monthOfYear + 1) + "/" + year1;
                         eventDate.setText(selectedDate);
@@ -83,7 +100,7 @@ public class FilterActivity extends AppCompatActivity {
         });
 
         confirmButton.setOnClickListener(v -> {
-            double distance = (double) distanceSeekBar.getProgress() * 100;
+            double distance = distanceSeekBar.getProgress();
             ArrayList<String> bloodTypes = new ArrayList<>();
             if (checkboxO.isChecked()) {
                 bloodTypes.add("O");

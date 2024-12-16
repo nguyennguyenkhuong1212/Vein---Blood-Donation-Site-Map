@@ -1,8 +1,16 @@
 package com.example.vein_blooddonationsite.models;
 
+import android.os.Build;
+
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
 
 public class User implements Serializable {
 
@@ -90,6 +98,32 @@ public class User implements Serializable {
 
     public void setSuperUser(boolean superUser) {
         isSuperUser = superUser;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+    public Date getLastDonationDate(List<Registration> registrations){
+        if (registrations == null || registrations.isEmpty()) {
+            return null; // No donations yet
+        }
+
+        // Filter for "DONOR" registrations with matching userId
+        List<Registration> donorRegistrations = registrations.stream()
+                .filter(r -> r.getRole().equals("DONOR")
+                        && r.getUserId() == userId)
+                .toList();
+
+        if (donorRegistrations.isEmpty()) {
+            return null; // No completed donor registrations for this user
+        }
+
+        // 1. Create a new ArrayList from the filtered list
+        List<Registration> sortedDonorRegistrations = new ArrayList<>(donorRegistrations);
+
+        // 2. Sort the new list
+        sortedDonorRegistrations.sort(Comparator.comparing(Registration::getDonationDate).reversed());
+
+        // Return the donationDate of the most recent registration
+        return sortedDonorRegistrations.get(0).getDonationDate();
     }
 
     @NonNull

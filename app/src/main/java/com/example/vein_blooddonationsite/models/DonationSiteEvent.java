@@ -108,6 +108,7 @@ public class DonationSiteEvent {
                 "\nstartTime=" + startTime +
                 "\nendTime=" + endTime +
                 "\nisRecurring=" + isRecurring +
-                '}';
+                "\nneededBloodTypes=" + neededBloodTypes +
+                "}\n";
     }
 }
