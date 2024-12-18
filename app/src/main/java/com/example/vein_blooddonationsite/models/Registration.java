@@ -2,6 +2,7 @@ package com.example.vein_blooddonationsite.models;
 
 import java.time.LocalTime;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 public class Registration {
@@ -13,10 +14,11 @@ public class Registration {
     private Date registrationDate;
     private Date donationDate;
     private Map<String, Integer> donationTime;
-    private String status; // "COMPLETED", "PENDING", "APPROVED"
+    private String status; // "COMPLETED", "PENDING", "APPROVED", "DECLINED"
     // "COMPLETED": For user who already donate blood
     // "PENDING": For user who waits for approval from the site manager
-    // "APPROVED": For user who already got approval
+    // "APPROVED": For user who already got an approval
+    // "DECLINED": For user who already got declined
 
     private String role; // "DONOR", "MANAGER", "VOLUNTEER"
     // "DONOR": For user who goes to an event as a donor
@@ -109,6 +111,15 @@ public class Registration {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public User getUser(List<User> users) {
+        for (User user : users) {
+            if (user.getUserId() == this.userId) {
+                return user;
+            }
+        }
+        return null;
     }
 
     @Override

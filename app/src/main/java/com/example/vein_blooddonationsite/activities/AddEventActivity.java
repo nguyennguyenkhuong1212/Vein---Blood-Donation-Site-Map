@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.vein_blooddonationsite.R;
 import com.example.vein_blooddonationsite.models.DonationSite;
 import com.example.vein_blooddonationsite.models.DonationSiteEvent;
+import com.example.vein_blooddonationsite.models.Registration;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -81,6 +82,13 @@ public class AddEventActivity extends AppCompatActivity {
                     neededBloodTypes.add("AB");
                 }
 
+                // Validation
+                if (eventName.isEmpty() || dateString.isEmpty() || startTimeString.isEmpty() || endTimeString.isEmpty()) {
+                    Toast.makeText(AddEventActivity.this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // Validate date format (dd/MM/yyyy)
                 if (!dateString.matches("^(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/[0-9]{4}$")) {
                     Toast.makeText(AddEventActivity.this, "Invalid date format. Please use dd/MM/yyyy", Toast.LENGTH_SHORT).show();
                     return;
@@ -90,12 +98,6 @@ public class AddEventActivity extends AppCompatActivity {
                 if (!startTimeString.matches("^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$") ||
                         !endTimeString.matches("^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$")) {
                     Toast.makeText(AddEventActivity.this, "Invalid time format. Please use HH:mm", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                // Validation (add more validation as needed)
-                if (dateString.isEmpty() || startTimeString.isEmpty() || endTimeString.isEmpty()) {
-                    Toast.makeText(AddEventActivity.this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -142,27 +144,67 @@ public class AddEventActivity extends AppCompatActivity {
                             endTimeMap.put("second", endTime.getSecond());
                             endTimeMap.put("nano", endTime.getNano());
 
-                            DonationSiteEvent newEvent = new DonationSiteEvent(
-                                    newEventId,
-                                    site.getSiteId(),
-                                    eventName,
-                                    eventDate,
-                                    startTimeMap,
-                                    endTimeMap,
-                                    isRecurring,
-                                    neededBloodTypes
-                            );
+                            // Check for overlapping events across all sites managed by the user
+                            db.collection("donationSites")
+                                    .whereEqualTo("adminId", site.getAdminId())
+                                    .get()
+                                    .addOnCompleteListener(siteTask -> {
+                                        if (siteTask.isSuccessful()) {
+                                            List<Integer> adminSiteIds = new ArrayList<>();
+                                            for (QueryDocumentSnapshot siteDoc : siteTask.getResult()) {
+                                                adminSiteIds.add(siteDoc.getLong("siteId").intValue());
+                                            }
 
-                            db.collection("events")
-                                    .document(String.valueOf(newEventId))
-                                    .set(newEvent)
-                                    .addOnSuccessListener(documentReference -> {
-                                        Toast.makeText(AddEventActivity.this, "Event added successfully", Toast.LENGTH_SHORT).show();
-                                        finish();
-                                    })
-                                    .addOnFailureListener(e -> {
-                                        Toast.makeText(AddEventActivity.this, "Error adding event", Toast.LENGTH_SHORT).show();
-                                        Log.e("AddEventActivity", "Error adding event", e);
+                                            db.collection("events")
+                                                    .whereIn("siteId", adminSiteIds)
+                                                    .get()
+                                                    .addOnCompleteListener(overlapTask -> {
+                                                        if (overlapTask.isSuccessful()) {
+                                                            boolean overlaps = false;
+                                                            for (QueryDocumentSnapshot document : overlapTask.getResult()) {
+                                                                DonationSiteEvent existingEvent = document.toObject(DonationSiteEvent.class);
+                                                                if (eventOverlaps(existingEvent, eventDate, startTime, endTime)) {
+                                                                    overlaps = true;
+                                                                    break;
+                                                                }
+                                                            }
+
+                                                            if (overlaps) {
+                                                                Toast.makeText(AddEventActivity.this, "Event overlaps with an existing event", Toast.LENGTH_SHORT).show();
+                                                            } else {
+                                                                // No overlaps, proceed to add the event
+                                                                DonationSiteEvent newEvent = new DonationSiteEvent(
+                                                                        newEventId,
+                                                                        site.getSiteId(),
+                                                                        eventName,
+                                                                        eventDate,
+                                                                        startTimeMap,
+                                                                        endTimeMap,
+                                                                        isRecurring,
+                                                                        neededBloodTypes
+                                                                );
+
+                                                                db.collection("events")
+                                                                        .document(String.valueOf(newEventId))
+                                                                        .set(newEvent)
+                                                                        .addOnSuccessListener(documentReference -> {
+                                                                            Toast.makeText(AddEventActivity.this, "Event added successfully", Toast.LENGTH_SHORT).show();
+                                                                            finish();
+                                                                        })
+                                                                        .addOnFailureListener(e -> {
+                                                                            Toast.makeText(AddEventActivity.this, "Error adding event", Toast.LENGTH_SHORT).show();
+                                                                            Log.e("AddEventActivity", "Error adding event", e);
+                                                                        });
+
+                                                                createAdminRegistration(site, newEvent);
+                                                            }
+                                                        } else {
+                                                            Log.w("AddEventActivity", "Error checking for overlapping events", overlapTask.getException());
+                                                        }
+                                                    });
+                                        } else {
+                                            Log.w("AddEventActivity", "Error getting admin sites", siteTask.getException());
+                                        }
                                     });
                         } else {
                             // Handle error getting new event ID
@@ -195,6 +237,82 @@ public class AddEventActivity extends AppCompatActivity {
                             }
                         }
                         listener.onComplete(Tasks.forResult(maxEventId + 1));
+                    } else {
+                        Log.w("Firestore", "Error getting documents.", task.getException());
+                        listener.onComplete(Tasks.forException(Objects.requireNonNull(task.getException())));
+                    }
+                });
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private boolean eventOverlaps(DonationSiteEvent existingEvent, Date newEventDate, LocalTime newStartTime, LocalTime newEndTime) {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+
+        String existingEventDateString = sdf.format(existingEvent.getEventDate());
+        String newEventDateString = sdf.format(newEventDate);
+
+        Log.d("HAHAHA", existingEvent.toString());
+        Log.d("HAHAHA", newEventDate.toString());
+        Log.d("HAHAHA", newStartTime.toString());
+        Log.d("HAHAHA", newEndTime.toString());
+
+        if (existingEventDateString.equals(newEventDateString)) {
+            LocalTime existingStartTime = LocalTime.of(existingEvent.getStartTime().get("hour"), existingEvent.getStartTime().get("minute"));
+            LocalTime existingEndTime = LocalTime.of(existingEvent.getEndTime().get("hour"), existingEvent.getEndTime().get("minute"));
+
+            return newStartTime.isBefore(existingEndTime) || newEndTime.isAfter(existingStartTime);
+        }
+        return false;
+    }
+
+
+    private void createAdminRegistration(DonationSite site, DonationSiteEvent event) {
+        getNewRegistrationId(task -> {
+            if (task.isSuccessful()) {
+                int newRegistrationId = task.getResult();
+
+                Map<String, Integer> donationTimeMap = new HashMap<>();
+                donationTimeMap.put("hour", event.getStartTime().get("hour"));
+                donationTimeMap.put("minute", event.getStartTime().get("minute"));
+
+                Registration registration = new Registration(
+                        newRegistrationId,
+                        site.getAdminId(),
+                        site.getSiteId(),
+                        event.getEventId(),
+                        new Date(),
+                        event.getEventDate(),
+                        donationTimeMap,
+                        "APPROVED",
+                        "MANAGER"
+                );
+
+                db.collection("registrations")
+                        .document(String.valueOf(newRegistrationId))
+                        .set(registration)
+                        .addOnSuccessListener(aVoid -> Log.d("AddEventActivity", "Admin registration added"))
+                        .addOnFailureListener(e -> Log.e("AddEventActivity", "Error adding admin registration", e));
+            }
+        });
+    }
+
+    private void getNewRegistrationId(OnCompleteListener<Integer> listener) {
+        db.collection("registrations")
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        int maxRegistrationId = 0;
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            try {
+                                int registrationId = Math.toIntExact(document.getLong("registrationId"));
+                                if (registrationId > maxRegistrationId) {
+                                    maxRegistrationId = registrationId;
+                                }
+                            } catch (NumberFormatException e) {
+                                Log.e("Firestore", "Error parsing registrationId", e);
+                            }
+                        }
+                        listener.onComplete(Tasks.forResult(maxRegistrationId + 1));
                     } else {
                         Log.w("Firestore", "Error getting documents.", task.getException());
                         listener.onComplete(Tasks.forException(Objects.requireNonNull(task.getException())));

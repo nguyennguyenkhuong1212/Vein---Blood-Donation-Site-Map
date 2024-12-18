@@ -1,17 +1,23 @@
 package com.example.vein_blooddonationsite.adapters;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Build;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.vein_blooddonationsite.MainActivity;
 import com.example.vein_blooddonationsite.R;
+import com.example.vein_blooddonationsite.activities.LogInActivity;
+import com.example.vein_blooddonationsite.activities.ViewRegistrationActivity;
 import com.example.vein_blooddonationsite.models.DonationSiteEvent;
 
 import java.text.SimpleDateFormat;
@@ -71,6 +77,13 @@ public class ViewManageDonationSiteEventAdapter extends RecyclerView.Adapter<Vie
 
         holder.neededBloodTypes.setText(
                 "Needed Blood Types: " + String.join(", ", event.getNeededBloodTypes()));
+
+        holder.viewRegistrationsButton.setVisibility(View.VISIBLE);
+        holder.viewRegistrationsButton.setOnClickListener(v -> {
+            Intent intent = new Intent(holder.itemView.getContext(), ViewRegistrationActivity.class);
+            intent.putExtra("event", event);
+            holder.itemView.getContext().startActivity(intent);
+        });
     }
 
     @Override
@@ -85,6 +98,7 @@ public class ViewManageDonationSiteEventAdapter extends RecyclerView.Adapter<Vie
         public TextView endTimeTextView;
         public TextView recurringTextView;
         public TextView neededBloodTypes;
+        public LinearLayout viewRegistrationsButton;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -94,6 +108,7 @@ public class ViewManageDonationSiteEventAdapter extends RecyclerView.Adapter<Vie
             endTimeTextView = itemView.findViewById(R.id.event_end_time_textview);
             recurringTextView = itemView.findViewById(R.id.event_recurring_textview);
             neededBloodTypes = itemView.findViewById(R.id.event_needed_blood_types_textview);
+            viewRegistrationsButton = itemView.findViewById(R.id.view_registration_button);
         }
     }
 }

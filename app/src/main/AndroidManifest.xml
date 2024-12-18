@@ -17,6 +17,9 @@
         android:theme="@style/Theme.VeinBloodDonationSite"
         tools:targetApi="31">
         <activity
+            android:name=".activities.ViewRegistrationActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.FilterActivity"
             android:exported="false" />
         <activity

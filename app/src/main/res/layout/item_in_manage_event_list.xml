@@ -129,6 +129,37 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="185dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:background="@drawable/view_manage_site_button"
+        android:paddingVertical="7dp"
+        android:layout_marginTop="10dp"
+        android:id="@+id/view_registration_button"
+        android:visibility="gone"
+        >
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/baseline_person_search_24"
+            android:layout_marginTop="-1dp"
+            app:tint="@color/white" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="View All Registration"
+            android:textColor="@color/white"
+            android:fontFamily="@font/instrumentsansbold"
+            android:textSize="12sp"
+            android:layout_marginStart="6dp"
+            />
+
+    </LinearLayout>
+
     <TextView
         android:id="@+id/event_recurring_textview"
         android:layout_width="match_parent"

@@ -154,7 +154,6 @@ public class ViewDonationSiteEventAdapter extends RecyclerView.Adapter<ViewDonat
                                         "DONOR"
                                 );
 
-                                // 4. Add the registration to Firestore
                                 db.collection("registrations")
                                         .document(String.valueOf(newRegistrationId))
                                         .set(registration)

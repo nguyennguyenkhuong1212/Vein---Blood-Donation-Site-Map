@@ -2,12 +2,14 @@ package com.example.vein_blooddonationsite.models;
 
 import androidx.annotation.NonNull;
 
+import java.io.Serializable;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-public class DonationSiteEvent {
+public class DonationSiteEvent implements Serializable {
 
     private int eventId;
     private int siteId;
@@ -95,6 +97,16 @@ public class DonationSiteEvent {
 
     public void setNeededBloodTypes(List<String> neededBloodTypes) {
         this.neededBloodTypes = neededBloodTypes;
+    }
+
+    public List<Registration> getUsersRegisteredByRole(List<Registration> registrations, String role) {
+        List<Registration> result = new ArrayList<>();
+        for (Registration registration : registrations) {
+            if (registration.getRole().equals(role.toUpperCase()) && registration.getEventId() == eventId) {  // Assuming you have a "type" field in Registration
+                result.add(registration);
+            }
+        }
+        return result;
     }
 
     @NonNull
