@@ -58,7 +58,6 @@
                             />
 
                         <TextView
-                            android:layout_marginTop="-5dp"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="User Email"
@@ -95,6 +94,7 @@
                     android:layout_height="1dp"
                     android:background="@color/primary"
                     android:layout_marginVertical="5dp"
+                    android:id="@+id/profile_line1"
                     />
 
                 <Button
@@ -106,6 +106,7 @@
                     android:textColor="@color/primary"
                     android:text="Edit Profile"
                     android:background="@drawable/profile_button"
+                    android:id="@+id/profile_edit_profile_button"
                     />
 
                 <View
@@ -113,6 +114,7 @@
                     android:layout_height="1dp"
                     android:background="@color/primary"
                     android:layout_marginVertical="5dp"
+                    android:id="@+id/profile_line2"
                     />
 
                 <Button
@@ -124,6 +126,7 @@
                     android:textColor="@color/primary"
                     android:text="Change Password"
                     android:background="@drawable/profile_button"
+                    android:id="@+id/profile_change_password_button"
                     />
 
                 <View
@@ -131,6 +134,7 @@
                     android:layout_height="1dp"
                     android:background="@color/primary"
                     android:layout_marginVertical="5dp"
+                    android:id="@+id/profile_line3"
                     />
 
                 <Button
@@ -142,6 +146,7 @@
                     android:textColor="@color/primary"
                     android:text="See Achievement"
                     android:background="@drawable/profile_button"
+                    android:id="@+id/profile_achievement_button"
                     />
 
                 <View
@@ -149,17 +154,20 @@
                     android:layout_height="1dp"
                     android:background="@color/primary"
                     android:layout_marginVertical="5dp"
+                    android:id="@+id/profile_line4"
                     />
 
                 <Button
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:drawableLeft="@drawable/inset_medal_icon_profile_button"
+                    android:drawableLeft="@drawable/inset_report_icon_profile_button"
                     android:drawableRight="@drawable/inset_icon_profile_button"
                     android:drawableTint="@color/primary"
                     android:textColor="@color/primary"
                     android:text="Generate Report"
                     android:background="@drawable/profile_button"
+                    android:layout_marginStart="2dp"
+                    android:id="@+id/profile_generate_report_button"
                     />
 
                 <View
@@ -167,37 +175,30 @@
                     android:layout_height="1dp"
                     android:background="@color/primary"
                     android:layout_marginVertical="5dp"
+                    android:id="@+id/profile_line5"
                     />
 
                 <Button
+                    android:layout_marginStart="3dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:drawableLeft="@drawable/inset_medal_icon_profile_button"
+                    android:drawableLeft="@drawable/inset_logout_icon_profile_button"
                     android:drawableRight="@drawable/inset_icon_profile_button"
                     android:drawableTint="@color/primary"
                     android:textColor="@color/primary"
                     android:text="Logout"
                     android:background="@drawable/profile_button"
+                    android:id="@+id/logout_button"
                     />
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="@color/primary"
                     android:layout_marginVertical="5dp"
+                    android:background="@color/primary"
+                    android:id="@+id/profile_line6"
                     />
 
         </LinearLayout>
-
-        <Button
-            android:id="@+id/logout_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Log Out"
-            android:backgroundTint="@color/primary"
-            android:layout_gravity="bottom|center"
-            android:layout_marginBottom="30dp"
-            android:drawablePadding="10dp"
-            />
 
 </FrameLayout>

@@ -126,6 +126,16 @@ public class User implements Serializable {
         return sortedDonorRegistrations.get(0).getDonationDate();
     }
 
+    public int getNumMedals(List<Registration> registrations){
+        int numMedals = 0;
+        for (Registration registration : registrations) {
+            if (registration.getStatus().equals("COMPLETED")) {
+                numMedals++;
+            }
+        }
+        return numMedals;
+    }
+
     @NonNull
     @Override
     public String toString() {

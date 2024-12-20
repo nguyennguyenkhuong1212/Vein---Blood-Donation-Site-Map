@@ -1,5 +1,6 @@
 package com.example.vein_blooddonationsite.activities;
 
+import static android.util.TypedValue.COMPLEX_UNIT_SP;
 import static java.security.AccessController.getContext;
 
 import android.annotation.SuppressLint;
@@ -62,7 +63,6 @@ public class ViewRegistrationActivity extends AppCompatActivity {
         registrationTable = findViewById(R.id.registrations_table);
 
         event = (DonationSiteEvent) getIntent().getSerializableExtra("event");
-
 
         backButton.setOnClickListener(v -> {
             finish();
@@ -136,13 +136,13 @@ public class ViewRegistrationActivity extends AppCompatActivity {
         TableRow.LayoutParams bloodTypeParams = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f);
         bloodTypeParams.setMargins(15, 10, 15, 10);
 
-        TableRow.LayoutParams roleParams = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f);
+        TableRow.LayoutParams roleParams = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1.35f);
         roleParams.setMargins(15, 10, 15, 10);
 
-        TableRow.LayoutParams statusParams = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1.35f);
+        TableRow.LayoutParams statusParams = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1.4f);
         statusParams.setMargins(15, 10, 15, 10);
 
-        TableRow.LayoutParams actionParams = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1.2f);
+        TableRow.LayoutParams actionParams = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1.35f);
         actionParams.setMargins(15, 10, 15, 10);
 
         // Load fonts
@@ -271,6 +271,37 @@ public class ViewRegistrationActivity extends AppCompatActivity {
 
                 buttonsLayout.addView(approveButton);
                 buttonsLayout.addView(declineButton);
+            } else if (Objects.equals(registration.getStatus(), "APPROVED")) {
+                Button completeButton = new Button(this);
+                completeButton.setBackground(ContextCompat.getDrawable(this, R.drawable.view_manage_site_button));
+                completeButton.setText("Complete");
+                completeButton.setTextSize(COMPLEX_UNIT_SP, 12);
+                completeButton.setTextColor(Color.WHITE);
+                completeButton.setPadding(5, -5, 5, -5);
+                completeButton.setLayoutParams(new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                ));
+
+                completeButton.setOnClickListener(v -> {
+                    db.collection("registrations")
+                            .document(String.valueOf(registration.getRegistrationId()))
+                            .update("status", "COMPLETED")
+                            .addOnSuccessListener(aVoid -> {
+                                registration.setStatus("COMPLETED");
+
+                                runOnUiThread(() -> {
+                                    Toast.makeText(ViewRegistrationActivity.this, "Registration completed", Toast.LENGTH_SHORT).show();
+                                    refreshTable(tableLayout);
+                                });
+                            })
+                            .addOnFailureListener(e -> {
+                                Toast.makeText(ViewRegistrationActivity.this, "Error ending registration", Toast.LENGTH_SHORT).show();
+                                Log.e("ViewRegistrations", "Error ending registration", e);
+                            });
+                });
+
+                buttonsLayout.addView(completeButton);
             }
 
             buttonsLayout.setLayoutParams(actionParams);
