@@ -16,6 +16,7 @@ import com.example.vein_blooddonationsite.R;
 import com.example.vein_blooddonationsite.activities.ChangePasswordActivity;
 import com.example.vein_blooddonationsite.activities.EditProfileActivity;
 import com.example.vein_blooddonationsite.activities.LogInActivity;
+import com.example.vein_blooddonationsite.activities.ViewAchievementsActivity;
 import com.example.vein_blooddonationsite.models.User;
 
 public class ProfilePage extends Fragment {
@@ -58,6 +59,12 @@ public class ProfilePage extends Fragment {
 
         profileChangePasswordButton.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), ChangePasswordActivity.class);
+            intent.putExtra("user", currentUser);
+            startActivity(intent);
+        });
+
+        profileAchievementButton.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), ViewAchievementsActivity.class);
             intent.putExtra("user", currentUser);
             startActivity(intent);
         });

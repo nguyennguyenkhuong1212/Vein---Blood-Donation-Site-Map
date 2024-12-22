@@ -13,6 +13,7 @@ import com.example.vein_blooddonationsite.activities.LogInActivity;
 import com.example.vein_blooddonationsite.fragments.ManageSitePage;
 import com.example.vein_blooddonationsite.fragments.ProfilePage;
 import com.example.vein_blooddonationsite.fragments.HomePage;
+import com.example.vein_blooddonationsite.fragments.MapPage;
 import com.example.vein_blooddonationsite.models.User;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
@@ -28,6 +29,11 @@ public class MainActivity extends AppCompatActivity {
 
                 if (itemId == R.id.bottom_bar_home) {
                     selectedFragment = new HomePage();
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable("user", currentUser);
+                    selectedFragment.setArguments(bundle);
+                } else if (itemId == R.id.bottom_bar_map) {
+                    selectedFragment = new MapPage();
                     Bundle bundle = new Bundle();
                     bundle.putSerializable("user", currentUser);
                     selectedFragment.setArguments(bundle);

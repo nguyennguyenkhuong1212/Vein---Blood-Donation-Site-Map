@@ -29,10 +29,15 @@ public class ChangePasswordActivity extends AppCompatActivity {
         EditText currentPasswordEditText = findViewById(R.id.change_password_current_edittext);
         EditText newPasswordEditText = findViewById(R.id.change_password_new_edittext);
         EditText confirmNewPasswordEditText = findViewById(R.id.change_password_confirm_edittext);
+        Button cancelButton = findViewById(R.id.change_password_cancel_button);
         Button saveButton = findViewById(R.id.change_password_save_button);
 
         // Get the current user object (you might need to pass it from the Fragment)
         User currentUser = (User) getIntent().getSerializableExtra("user");
+
+        cancelButton.setOnClickListener(v-> {
+            finish();
+        });
 
         saveButton.setOnClickListener(v -> {
             String currentPassword = currentPasswordEditText.getText().toString().trim();

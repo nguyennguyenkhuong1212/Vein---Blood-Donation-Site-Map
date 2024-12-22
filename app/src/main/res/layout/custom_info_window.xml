@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="200dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="10dp"
+    android:background="@drawable/info_window_background"
+    android:gravity="center">
+
+    <TextView
+        android:id="@+id/info_window_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Site Name"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/info_window_address"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Site Details"
+        android:textColor="@android:color/black"
+        android:textSize="14sp"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/info_window_operating_hours"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Site Details"
+        android:textColor="@android:color/black"
+        android:textSize="14sp"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/info_window_blood_types"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Site Details"
+        android:textColor="@android:color/black"
+        android:textSize="14sp"
+        android:gravity="center" />
+
+</LinearLayout>

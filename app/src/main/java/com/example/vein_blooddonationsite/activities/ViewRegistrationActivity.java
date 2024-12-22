@@ -145,11 +145,9 @@ public class ViewRegistrationActivity extends AppCompatActivity {
         TableRow.LayoutParams actionParams = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1.35f);
         actionParams.setMargins(15, 10, 15, 10);
 
-        // Load fonts
         Typeface headerFont = ResourcesCompat.getFont(this, R.font.instrumentsansbold);
         Typeface dataFont = ResourcesCompat.getFont(this, R.font.instrumentsans);
 
-        // Create header row
         TableRow headerRow = new TableRow(this);
         String[] headers = {"Name", "Blood Type", "Role", "Status", "Actions"};
 

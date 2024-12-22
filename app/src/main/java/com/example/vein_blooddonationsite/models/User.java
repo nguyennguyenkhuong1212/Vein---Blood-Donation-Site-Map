@@ -1,6 +1,7 @@
 package com.example.vein_blooddonationsite.models;
 
 import android.os.Build;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -128,7 +129,9 @@ public class User implements Serializable {
 
     public int getNumMedals(List<Registration> registrations){
         int numMedals = 0;
+        Log.d("AHAHAHAHAHA", String.valueOf(registrations.size()));
         for (Registration registration : registrations) {
+            Log.d("Status",  registration.getStatus());
             if (registration.getStatus().equals("COMPLETED")) {
                 numMedals++;
             }
