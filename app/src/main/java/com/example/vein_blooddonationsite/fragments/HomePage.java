@@ -22,12 +22,15 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Looper;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
@@ -82,6 +85,7 @@ public class HomePage extends Fragment {
     List<DonationSiteEvent> events = new ArrayList<>();
     private ProgressBar loadingSpinner;
     private View overlay;
+    private EditText search_bar;
     User currentUser;
 
     @SuppressLint("SimpleDateFormat")
@@ -121,6 +125,7 @@ public class HomePage extends Fragment {
         emptyInform = view.findViewById(R.id.view_all_donation_sites_empty_inform);
         loadingSpinner = view.findViewById(R.id.loading_spinner);
         overlay = view.findViewById(R.id.loading_spinner_overlay);
+        search_bar = view.findViewById(R.id.search_bar);
         assert getArguments() != null;
         currentUser = (User) getArguments().getSerializable("user");
 
@@ -135,6 +140,7 @@ public class HomePage extends Fragment {
         viewDonationSitesRecyclerView = view.findViewById(R.id.view_all_donation_sites_recycler_view);
         viewDonationSitesRecyclerView.setAdapter(adapter);
 
+
         getLocation(task -> {
             if (!task.isSuccessful()) {
                 Log.e("HomePage", "Error getting location", task.getException());
@@ -144,7 +150,37 @@ public class HomePage extends Fragment {
 
         fetchAllDonationSites();
 
+        search_bar.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // Not used
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Not used
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                filterDonationSites(s.toString());
+            }
+        });
+
         return view;
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private void filterDonationSites(String text) {
+        List<DonationSite> filteredList = new ArrayList<>();
+        for (DonationSite site : adapter.donationSites) {
+            if (site.getName().toLowerCase().contains(text.toLowerCase()) ||
+                    site.getAddress().toLowerCase().contains(text.toLowerCase())) {
+                filteredList.add(site);
+            }
+        }
+        adapter.donationSites = filteredList;
+        adapter.notifyDataSetChanged();
     }
 
     @SuppressLint("NotifyDataSetChanged")
