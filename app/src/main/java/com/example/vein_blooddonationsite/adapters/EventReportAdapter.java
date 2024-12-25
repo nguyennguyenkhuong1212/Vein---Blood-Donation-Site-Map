@@ -1,22 +1,25 @@
 package com.example.vein_blooddonationsite.adapters;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.Intent;
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.pdf.PdfDocument;
 import android.net.Uri;
-import android.os.Build;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.vein_blooddonationsite.R;
 import com.example.vein_blooddonationsite.models.DonationSiteEvent;
 import com.example.vein_blooddonationsite.models.Registration;
@@ -40,7 +43,6 @@ public class EventReportAdapter extends RecyclerView.Adapter<EventReportAdapter.
     private final List<DonationSiteEvent> events;
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final List<User> users;
-    private EventViewHolder currentViewHolder;
 
     public EventReportAdapter(List<DonationSiteEvent> events, List<User> users) {
         this.events = events;
@@ -55,7 +57,6 @@ public class EventReportAdapter extends RecyclerView.Adapter<EventReportAdapter.
     }
 
     @Override
-    @RequiresApi(api = Build.VERSION_CODES.O)
     public void onBindViewHolder(@NonNull EventViewHolder holder, int position) {
         DonationSiteEvent event = events.get(position);
 
@@ -116,9 +117,7 @@ public class EventReportAdapter extends RecyclerView.Adapter<EventReportAdapter.
                                 }
                             }
 
-                            // Set the current ViewHolder
-                            currentViewHolder = holder;
-                            holder.generatePdfReport(event, totalBloodAmount, bloodTypeCounts);
+                            holder.generatePdfReport(holder.itemView.getContext(), event, totalBloodAmount, bloodTypeCounts);
                         } else {
                             Log.e("GenerateReport", "Error getting registrations: ", task.getException());
                         }
@@ -131,12 +130,6 @@ public class EventReportAdapter extends RecyclerView.Adapter<EventReportAdapter.
         return events.size();
     }
 
-    public void handlePdfCreationResult(Uri uri) {
-        if (currentViewHolder != null) {
-            currentViewHolder.handlePdfCreationResult(uri);
-        }
-    }
-
     static class EventViewHolder extends RecyclerView.ViewHolder {
         TextView eventNameTextView;
         TextView eventDateTextView;
@@ -144,10 +137,6 @@ public class EventReportAdapter extends RecyclerView.Adapter<EventReportAdapter.
         TextView eventEndTimeTextView;
         TextView eventBloodTypesTextView;
         LinearLayout generateReportButton;
-        private DonationSiteEvent eventForReport;
-        private int totalBloodAmountForReport;
-        private Map<String, Integer> bloodTypeCountsForReport;
-        private static final int CREATE_PDF_REQUEST_CODE = 123;
 
         public EventViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -159,28 +148,9 @@ public class EventReportAdapter extends RecyclerView.Adapter<EventReportAdapter.
             generateReportButton = itemView.findViewById(R.id.generate_report_button);
         }
 
-        public void generatePdfReport(DonationSiteEvent event, int totalBloodAmount, Map<String, Integer> bloodTypeCounts) {
-            Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
-            intent.addCategory(Intent.CATEGORY_OPENABLE);
-            intent.setType("application/pdf");
-            intent.putExtra(Intent.EXTRA_TITLE, "event_report.pdf"); // Suggest a file name
-
-            // Start the activity for result, but handle the result in the adapter
-            ((Activity) itemView.getContext()).startActivityForResult(intent, CREATE_PDF_REQUEST_CODE);
-
-            // Store the data in the ViewHolder
-            this.eventForReport = event;
-            this.totalBloodAmountForReport = totalBloodAmount;
-            this.bloodTypeCountsForReport = bloodTypeCounts;
-        }
-
-        public void handlePdfCreationResult(Uri uri) {
-            createAndSavePdf(uri, eventForReport, totalBloodAmountForReport, bloodTypeCountsForReport);
-        }
-
-        private void createAndSavePdf(Uri uri, DonationSiteEvent event, int totalBloodAmount, Map<String, Integer> bloodTypeCounts) {
+        public void generatePdfReport(Context context, DonationSiteEvent event, int totalBloodAmount, Map<String, Integer> bloodTypeCounts) {
             PdfDocument document = new PdfDocument();
-            PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(595, 842, 1).create(); // A4 size
+            PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(595, 842, 1).create();
             PdfDocument.Page page = document.startPage(pageInfo);
             Canvas canvas = page.getCanvas();
             Paint paint = new Paint();
@@ -191,6 +161,7 @@ public class EventReportAdapter extends RecyclerView.Adapter<EventReportAdapter.
             y += 30;
             canvas.drawText("Event Name: " + event.getEventName(), x, y, paint);
             y += 20;
+
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
             String eventDateString = dateFormat.format(event.getEventDate());
             canvas.drawText("Date: " + eventDateString, x, y, paint);
@@ -207,12 +178,33 @@ public class EventReportAdapter extends RecyclerView.Adapter<EventReportAdapter.
 
             document.finishPage(page);
 
-            try (OutputStream os = itemView.getContext().getContentResolver().openOutputStream(uri)) {
-                document.writeTo(os);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            savePdfToMediaStore(context, document);
+        }
 
+        private void savePdfToMediaStore(Context context, PdfDocument document) {
+            ContentResolver resolver = context.getContentResolver();
+
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, "event_report.pdf");
+            contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf");
+            contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
+
+            Uri pdfUri = resolver.insert(MediaStore.Files.getContentUri("external"), contentValues);
+            if (pdfUri != null) {
+                try (OutputStream outputStream = resolver.openOutputStream(pdfUri)) {
+                    if (outputStream != null) {
+                        document.writeTo(outputStream);
+                        Toast.makeText(context, "PDF saved to Downloads folder", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (IOException e) {
+                    Log.e("PDFSave", "Error saving PDF: ", e);
+                    Toast.makeText(context, "Failed to save PDF", Toast.LENGTH_SHORT).show();
+                } finally {
+                    document.close();
+                }
+            } else {
+                Toast.makeText(context, "Failed to create file", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }
