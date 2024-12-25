@@ -1,9 +1,12 @@
 package com.example.vein_blooddonationsite.activities;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ImageButton;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,6 +17,7 @@ import com.example.vein_blooddonationsite.models.DonationSiteEvent;
 import com.example.vein_blooddonationsite.models.User;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +27,14 @@ public class GenerateReportActivity extends AppCompatActivity {
     private final List<DonationSiteEvent> events = new ArrayList<>();
     private final List<User> users = new ArrayList<>();
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    private final ActivityResultLauncher<Intent> saveFileLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                    // The URI will be handled by EventReportAdapter
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +52,7 @@ public class GenerateReportActivity extends AppCompatActivity {
         fetchAllUsers();
 
         eventRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        eventAdapter = new EventReportAdapter(events, users, this);
+        eventAdapter = new EventReportAdapter(events, users);
         eventRecyclerView.setAdapter(eventAdapter);
     }
 

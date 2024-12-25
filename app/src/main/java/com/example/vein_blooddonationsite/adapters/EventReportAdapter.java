@@ -3,11 +3,11 @@ package com.example.vein_blooddonationsite.adapters;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.pdf.PdfDocument;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,10 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.vein_blooddonationsite.R;
@@ -43,30 +40,13 @@ import java.util.Map;
 
 public class EventReportAdapter extends RecyclerView.Adapter<EventReportAdapter.EventViewHolder> {
 
-    private static PdfDocument pendingDocument; // Store the pending PdfDocument
-
     private final List<DonationSiteEvent> events;
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final List<User> users;
-    private final ActivityResultLauncher<Intent> pickDirectoryLauncher;
 
-    public EventReportAdapter(List<DonationSiteEvent> events, List<User> users, AppCompatActivity activity) {
+    public EventReportAdapter(List<DonationSiteEvent> events, List<User> users) {
         this.events = events;
         this.users = users;
-
-        pickDirectoryLauncher = activity.registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == AppCompatActivity.RESULT_OK && result.getData() != null) {
-                        Uri treeUri = result.getData().getData();
-                        if (treeUri != null) {
-                            activity.getContentResolver().takePersistableUriPermission(
-                                    treeUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                            savePdfToSelectedDirectory(activity, treeUri);
-                        }
-                    }
-                }
-        );
     }
 
     @NonNull
@@ -138,7 +118,7 @@ public class EventReportAdapter extends RecyclerView.Adapter<EventReportAdapter.
                                 }
                             }
 
-                            holder.generatePdfReport(holder.itemView.getContext(), event, totalBloodAmount, bloodTypeCounts, pickDirectoryLauncher);
+                            holder.generatePdfReport(holder.itemView.getContext(), event, totalBloodAmount, bloodTypeCounts);
                         } else {
                             Log.e("GenerateReport", "Error getting registrations: ", task.getException());
                         }
@@ -169,7 +149,7 @@ public class EventReportAdapter extends RecyclerView.Adapter<EventReportAdapter.
             generateReportButton = itemView.findViewById(R.id.generate_report_button);
         }
 
-        public void generatePdfReport(Context context, DonationSiteEvent event, int totalBloodAmount, Map<String, Integer> bloodTypeCounts, ActivityResultLauncher<Intent> launcher) {
+        public void generatePdfReport(Context context, DonationSiteEvent event, int totalBloodAmount, Map<String, Integer> bloodTypeCounts) {
             PdfDocument document = new PdfDocument();
             PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(595, 842, 1).create();
             PdfDocument.Page page = document.startPage(pageInfo);
@@ -180,37 +160,44 @@ public class EventReportAdapter extends RecyclerView.Adapter<EventReportAdapter.
             int y = 50; // Start Y position
             paint.setTextSize(18);
 
+            // Centered "Event Report" title
             String title = "Event Report";
             float titleWidth = paint.measureText(title);
             canvas.drawText(title, (canvasWidth - titleWidth) / 2, y, paint);
 
             y += 30;
 
+            // Event Name
             String eventName = "Event Name: " + event.getEventName();
             float eventNameWidth = paint.measureText(eventName);
             canvas.drawText(eventName, (canvasWidth - eventNameWidth) / 2, y, paint);
 
             y += 20;
 
+            // Event Date
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-            String eventDate = "Date: " + dateFormat.format(event.getEventDate());
+            String eventDateString = dateFormat.format(event.getEventDate());
+            String eventDate = "Date: " + eventDateString;
             float eventDateWidth = paint.measureText(eventDate);
             canvas.drawText(eventDate, (canvasWidth - eventDateWidth) / 2, y, paint);
 
             y += 30;
 
+            // Total Blood Collected
             String totalBlood = "Total Blood Collected: " + totalBloodAmount + " ml";
             float totalBloodWidth = paint.measureText(totalBlood);
             canvas.drawText(totalBlood, (canvasWidth - totalBloodWidth) / 2, y, paint);
 
             y += 30;
 
+            // Blood Type Breakdown
             String breakdownHeader = "Blood Type Breakdown:";
             float breakdownHeaderWidth = paint.measureText(breakdownHeader);
             canvas.drawText(breakdownHeader, (canvasWidth - breakdownHeaderWidth) / 2, y, paint);
 
             y += 20;
 
+            // Iterate through blood type counts
             for (Map.Entry<String, Integer> entry : bloodTypeCounts.entrySet()) {
                 String bloodTypeLine = entry.getKey() + ": " + entry.getValue() + " units";
                 float bloodTypeLineWidth = paint.measureText(bloodTypeLine);
@@ -220,41 +207,42 @@ public class EventReportAdapter extends RecyclerView.Adapter<EventReportAdapter.
 
             document.finishPage(page);
 
-            pendingDocument = document; // Store the document for later
-
-            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-            launcher.launch(intent);
-        }
-    }
-
-    private void savePdfToSelectedDirectory(Context context, Uri treeUri) {
-        if (pendingDocument == null) {
-            Toast.makeText(context, "No document to save!", Toast.LENGTH_SHORT).show();
-            return;
+            savePdfToMediaStore(context, document);
         }
 
-        ContentResolver resolver = context.getContentResolver();
+        private void savePdfToMediaStore(Context context, PdfDocument document) {
+            ContentResolver resolver = context.getContentResolver();
 
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, "event_report.pdf");
-        contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf");
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, "event_report.pdf");
+            contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf");
 
-        Uri pdfUri = resolver.insert(MediaStore.Files.getContentUri("external"), contentValues);
-        if (pdfUri != null) {
-            try (OutputStream outputStream = resolver.openOutputStream(pdfUri)) {
-                if (outputStream != null) {
-                    pendingDocument.writeTo(outputStream);
-                    Toast.makeText(context, "PDF saved successfully!", Toast.LENGTH_SHORT).show();
-                }
-            } catch (IOException e) {
-                Log.e("PDFSave", "Error saving PDF: ", e);
-                Toast.makeText(context, "Failed to save PDF", Toast.LENGTH_SHORT).show();
-            } finally {
-                pendingDocument.close();
-                pendingDocument = null;
+            // Determine the download directory based on Android version
+            String downloadDirectory;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                downloadDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
+            } else {
+                downloadDirectory = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download";
             }
-        } else {
-            Toast.makeText(context, "Failed to create file", Toast.LENGTH_SHORT).show();
+            contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, downloadDirectory);
+
+
+            Uri pdfUri = resolver.insert(MediaStore.Files.getContentUri("external"), contentValues);
+            if (pdfUri != null) {
+                try (OutputStream outputStream = resolver.openOutputStream(pdfUri)) {
+                    if (outputStream != null) {
+                        document.writeTo(outputStream);
+                        Toast.makeText(context, "PDF saved successfully", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (IOException e) {
+                    Log.e("PDFSave", "Error saving PDF: ", e);
+                    Toast.makeText(context, "Failed to save PDF", Toast.LENGTH_SHORT).show();
+                } finally {
+                    document.close();
+                }
+            } else {
+                Toast.makeText(context, "Failed to create file", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }
