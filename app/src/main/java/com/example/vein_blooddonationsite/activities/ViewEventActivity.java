@@ -82,7 +82,7 @@ public class ViewEventActivity extends AppCompatActivity {
                         LocalDate today = LocalDate.now();
                         LocalDate eventLocalDate = event.getEventDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                         if (!eventLocalDate.isBefore(today)) {
-                            events.add(event); // Add the event only if it's not before today
+                            events.add(event);
                         }
                     }
 
@@ -114,6 +114,7 @@ public class ViewEventActivity extends AppCompatActivity {
                 }
 
                 assert response != null;
+                registrations.clear();
                 for (QueryDocumentSnapshot document : response) {
                     Registration registration = document.toObject(Registration.class);
                     registrations.add(registration);

@@ -149,6 +149,7 @@ public class ViewAchievementsActivity extends AppCompatActivity {
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
+                        registrations.clear();
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             Registration registration = document.toObject(Registration.class);
                             registrations.add(registration);

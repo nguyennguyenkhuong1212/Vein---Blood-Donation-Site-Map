@@ -56,10 +56,8 @@ public class ViewManageDonationSiteEventAdapter extends RecyclerView.Adapter<Vie
         String eventDateString = dateFormat.format(event.getEventDate());
         holder.dateTextView.setText(eventDateString);
 
-        // Format the time (no need for SDK version check)
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
-        // Assuming startTime and endTime are Maps in your DonationSiteEvent class
         Map<String, Integer> startTimeMap = event.getStartTime();
         LocalTime startTime = LocalTime.of(startTimeMap.get("hour"), startTimeMap.get("minute"));
         String startTimeString = startTime.format(timeFormatter);

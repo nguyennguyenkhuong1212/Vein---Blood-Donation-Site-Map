@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
+import com.example.vein_blooddonationsite.activities.GenerateReportActivity;
 import com.example.vein_blooddonationsite.R;
 import com.example.vein_blooddonationsite.activities.ChangePasswordActivity;
 import com.example.vein_blooddonationsite.activities.EditProfileActivity;
@@ -65,6 +66,12 @@ public class ProfilePage extends Fragment {
 
         profileAchievementButton.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), ViewAchievementsActivity.class);
+            intent.putExtra("user", currentUser);
+            startActivity(intent);
+        });
+
+        profileReportButton.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), GenerateReportActivity.class);
             intent.putExtra("user", currentUser);
             startActivity(intent);
         });

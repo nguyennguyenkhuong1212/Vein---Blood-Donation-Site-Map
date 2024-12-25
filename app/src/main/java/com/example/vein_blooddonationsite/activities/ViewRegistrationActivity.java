@@ -49,7 +49,6 @@ public class ViewRegistrationActivity extends AppCompatActivity {
     TextView event_name_textview;
     ImageButton backButton;
     TextView empty_inform;
-    RecyclerView registrationsRecyclerView;
     TableLayout registrationTable;
 
     @Override
@@ -83,6 +82,8 @@ public class ViewRegistrationActivity extends AppCompatActivity {
                         return;
                     }
 
+                    users.clear();
+
                     assert response != null;
                     for (QueryDocumentSnapshot document : response) {
                         User user = document.toObject(User.class);
@@ -97,6 +98,7 @@ public class ViewRegistrationActivity extends AppCompatActivity {
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
+                        registrations.clear();
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             Registration registration = document.toObject(Registration.class);
                             if (Objects.equals(registration.getRole(), "MANAGER")) continue;
