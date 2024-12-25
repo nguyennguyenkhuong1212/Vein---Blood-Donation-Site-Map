@@ -14,6 +14,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
@@ -163,7 +165,7 @@ public class EventReportAdapter extends RecyclerView.Adapter<EventReportAdapter.
             Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             intent.setType("application/pdf");
-            intent.putExtra(Intent.EXTRA_TITLE, "event_report.pdf"); // Suggest a file name
+            intent.putExtra(Intent.EXTRA_TITLE, "event_report.pdf");
 
             // Start the activity for result, but handle the result in the adapter
             ((Activity) itemView.getContext()).startActivityForResult(intent, CREATE_PDF_REQUEST_CODE);
@@ -179,40 +181,51 @@ public class EventReportAdapter extends RecyclerView.Adapter<EventReportAdapter.
         }
 
         private void createAndSavePdf(Uri uri, DonationSiteEvent event, int totalBloodAmount, Map<String, Integer> bloodTypeCounts) {
-            PdfDocument document = new PdfDocument();
-            PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(595, 842, 1).create(); // A4 size
-            PdfDocument.Page page = document.startPage(pageInfo);
-            Canvas canvas = page.getCanvas();
-            Paint paint = new Paint();
+            try {
+                PdfDocument document = new PdfDocument();
+                PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(595, 842, 1).create();
+                PdfDocument.Page page = document.startPage(pageInfo);
+                Canvas canvas = page.getCanvas();
+                Paint paint = new Paint();
 
-            int x = 50, y = 50;
-            paint.setTextSize(18);
-            canvas.drawText("Event Report", x, y, paint);
-            y += 30;
-            canvas.drawText("Event Name: " + event.getEventName(), x, y, paint);
-            y += 20;
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-            String eventDateString = dateFormat.format(event.getEventDate());
-            canvas.drawText("Date: " + eventDateString, x, y, paint);
-
-            y += 30;
-            canvas.drawText("Total Blood Collected: " + totalBloodAmount + " ml", x, y, paint);
-
-            y += 30;
-            canvas.drawText("Blood Type Breakdown:", x, y, paint);
-            for (Map.Entry<String, Integer> entry : bloodTypeCounts.entrySet()) {
+                int x = 50, y = 50;
+                paint.setTextSize(18);
+                canvas.drawText("Event Report", x, y, paint);
+                y += 30;
+                canvas.drawText("Event Name: " + event.getEventName(), x, y, paint);
                 y += 20;
-                canvas.drawText(entry.getKey() + ": " + entry.getValue() + " units", x, y, paint);
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                String eventDateString = dateFormat.format(event.getEventDate());
+                canvas.drawText("Date: " + eventDateString, x, y, paint);
+
+                y += 30;
+                canvas.drawText("Total Blood Collected: " + totalBloodAmount + " ml", x, y, paint);
+
+                y += 30;
+                canvas.drawText("Blood Type Breakdown:", x, y, paint);
+                for (Map.Entry<String, Integer> entry : bloodTypeCounts.entrySet()) {
+                    y += 20;
+                    canvas.drawText(entry.getKey() + ": " + entry.getValue() + " units", x, y, paint);
+                }
+
+                document.finishPage(page);
+
+                try (OutputStream os = itemView.getContext().getContentResolver().openOutputStream(uri)) {
+                    if (os != null) {
+                        document.writeTo(os);
+                        Toast.makeText(itemView.getContext(), "PDF report generated successfully!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Log.e("GenerateReport", "Error: OutputStream is null");
+                        Toast.makeText(itemView.getContext(), "Error generating PDF report", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (IOException e) {
+                    Log.e("GenerateReport", "Error generating PDF: ", e);
+                    Toast.makeText(itemView.getContext(), "Error generating PDF report", Toast.LENGTH_SHORT).show();
+                }
+            } catch (Exception e) {
+                Log.e("GenerateReport", "Error generating PDF: ", e);
+                Toast.makeText(itemView.getContext(), "Error generating PDF report", Toast.LENGTH_SHORT).show();
             }
-
-            document.finishPage(page);
-
-            try (OutputStream os = itemView.getContext().getContentResolver().openOutputStream(uri)) {
-                document.writeTo(os);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
         }
     }
 }
