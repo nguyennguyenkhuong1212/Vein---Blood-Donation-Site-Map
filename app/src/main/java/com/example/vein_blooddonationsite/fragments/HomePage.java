@@ -85,8 +85,8 @@ public class HomePage extends Fragment {
     List<DonationSiteEvent> events = new ArrayList<>();
     private ProgressBar loadingSpinner;
     private View overlay;
-    private EditText search_bar;
     User currentUser;
+    List<DonationSite> sites = new ArrayList<>();
 
     @SuppressLint("SimpleDateFormat")
     private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -125,7 +125,7 @@ public class HomePage extends Fragment {
         emptyInform = view.findViewById(R.id.view_all_donation_sites_empty_inform);
         loadingSpinner = view.findViewById(R.id.loading_spinner);
         overlay = view.findViewById(R.id.loading_spinner_overlay);
-        search_bar = view.findViewById(R.id.search_bar);
+        EditText search_bar = view.findViewById(R.id.search_bar);
         assert getArguments() != null;
         currentUser = (User) getArguments().getSerializable("user");
 
@@ -163,7 +163,11 @@ public class HomePage extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-                filterDonationSites(s.toString());
+                if (s.toString().isEmpty()) {
+                    resetDonationSites();
+                } else {
+                    filterDonationSites(s.toString());
+                }
             }
         });
 
@@ -171,9 +175,15 @@ public class HomePage extends Fragment {
     }
 
     @SuppressLint("NotifyDataSetChanged")
+    private void resetDonationSites() {
+        adapter.donationSites = sites;
+        adapter.notifyDataSetChanged();
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
     private void filterDonationSites(String text) {
         List<DonationSite> filteredList = new ArrayList<>();
-        for (DonationSite site : adapter.donationSites) {
+        for (DonationSite site : sites) {
             if (site.getName().toLowerCase().contains(text.toLowerCase()) ||
                     site.getAddress().toLowerCase().contains(text.toLowerCase())) {
                 filteredList.add(site);
@@ -201,7 +211,6 @@ public class HomePage extends Fragment {
                                     return;
                                 }
 
-                                List<DonationSite> sites = new ArrayList<>();
                                 assert response != null;
                                 for (QueryDocumentSnapshot document : response) {
                                     try {
