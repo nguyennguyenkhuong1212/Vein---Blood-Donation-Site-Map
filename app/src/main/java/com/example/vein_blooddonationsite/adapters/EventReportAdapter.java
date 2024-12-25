@@ -1,14 +1,12 @@
 package com.example.vein_blooddonationsite.adapters;
 
-import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.pdf.PdfDocument;
 import android.net.Uri;
-import android.os.Environment;
-import android.provider.MediaStore;
+import android.os.Build;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +15,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.vein_blooddonationsite.R;
@@ -27,7 +28,6 @@ import com.example.vein_blooddonationsite.models.User;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.time.LocalTime;
@@ -137,6 +137,7 @@ public class EventReportAdapter extends RecyclerView.Adapter<EventReportAdapter.
         TextView eventEndTimeTextView;
         TextView eventBloodTypesTextView;
         LinearLayout generateReportButton;
+        ActivityResultLauncher<Intent> fileChooserLauncher;
 
         public EventViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -146,64 +147,67 @@ public class EventReportAdapter extends RecyclerView.Adapter<EventReportAdapter.
             eventEndTimeTextView = itemView.findViewById(R.id.generate_report_event_end_time_textview);
             eventBloodTypesTextView = itemView.findViewById(R.id.generate_report_event_needed_blood_types_textview);
             generateReportButton = itemView.findViewById(R.id.generate_report_button);
+
+            fileChooserLauncher = ((ActivityResultLauncher<Intent>) itemView.getContext());
         }
 
         public void generatePdfReport(Context context, DonationSiteEvent event, int totalBloodAmount, Map<String, Integer> bloodTypeCounts) {
+            Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType("application/pdf");
+            intent.putExtra(Intent.EXTRA_TITLE, "event_report.pdf");
+
+            fileChooserLauncher.launch(intent);
+        }
+
+        private void savePdfToUri(Context context, Uri uri, DonationSiteEvent event, int totalBloodAmount, Map<String, Integer> bloodTypeCounts) {
             PdfDocument document = new PdfDocument();
             PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(595, 842, 1).create();
             PdfDocument.Page page = document.startPage(pageInfo);
             Canvas canvas = page.getCanvas();
             Paint paint = new Paint();
 
-            int x = 50, y = 50;
+            int canvasWidth = canvas.getWidth();
+            int y = 50;
             paint.setTextSize(18);
-            canvas.drawText("Event Report", x, y, paint);
+            paint.setTextAlign(Paint.Align.CENTER);
+
+            canvas.drawText("Event Report", canvasWidth / 2, y, paint);
             y += 30;
-            canvas.drawText("Event Name: " + event.getEventName(), x, y, paint);
+            canvas.drawText("Event Name: " + event.getEventName(), canvasWidth / 2, y, paint);
             y += 20;
 
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
             String eventDateString = dateFormat.format(event.getEventDate());
-            canvas.drawText("Date: " + eventDateString, x, y, paint);
+            canvas.drawText("Date: " + eventDateString, canvasWidth / 2, y, paint);
 
             y += 30;
-            canvas.drawText("Total Blood Collected: " + totalBloodAmount + " ml", x, y, paint);
+            canvas.drawText("Total Blood Collected: " + totalBloodAmount + " ml", canvasWidth / 2, y, paint);
 
             y += 30;
-            canvas.drawText("Blood Type Breakdown:", x, y, paint);
+            canvas.drawText("Blood Type Breakdown:", canvasWidth / 2, y, paint);
             for (Map.Entry<String, Integer> entry : bloodTypeCounts.entrySet()) {
                 y += 20;
-                canvas.drawText(entry.getKey() + ": " + entry.getValue() + " units", x, y, paint);
+                canvas.drawText(entry.getKey() + ": " + entry.getValue() + " units", canvasWidth / 2, y, paint);
             }
+
+            // Placeholder for chart generation
+            y += 40;
+            paint.setTextSize(14);
+            canvas.drawText("[Chart Placeholder]", canvasWidth / 2, y, paint);
 
             document.finishPage(page);
 
-            savePdfToMediaStore(context, document, "event_report.pdf");
-        }
-
-        private void savePdfToMediaStore(Context context, PdfDocument document, String fileName) {
-            ContentResolver resolver = context.getContentResolver();
-
-            ContentValues contentValues = new ContentValues();
-            contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName);
-            contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf");
-            contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
-
-            Uri pdfUri = resolver.insert(MediaStore.Files.getContentUri("external"), contentValues);
-            if (pdfUri != null) {
-                try (OutputStream outputStream = resolver.openOutputStream(pdfUri)) {
-                    if (outputStream != null) {
-                        document.writeTo(outputStream);
-                        Toast.makeText(context, "PDF saved to Downloads folder", Toast.LENGTH_SHORT).show();
-                    }
-                } catch (IOException e) {
-                    Log.e("PDFSave", "Error saving PDF: ", e);
-                    Toast.makeText(context, "Failed to save PDF", Toast.LENGTH_SHORT).show();
-                } finally {
-                    document.close();
+            try (OutputStream outputStream = context.getContentResolver().openOutputStream(uri)) {
+                if (outputStream != null) {
+                    document.writeTo(outputStream);
+                    Toast.makeText(context, "PDF saved successfully!", Toast.LENGTH_SHORT).show();
                 }
-            } else {
-                Toast.makeText(context, "Failed to create file", Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
+                Log.e("PDFSave", "Error saving PDF: ", e);
+                Toast.makeText(context, "Failed to save PDF", Toast.LENGTH_SHORT).show();
+            } finally {
+                document.close();
             }
         }
     }
