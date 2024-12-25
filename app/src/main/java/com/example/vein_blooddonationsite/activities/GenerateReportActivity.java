@@ -40,7 +40,7 @@ public class GenerateReportActivity extends AppCompatActivity {
         fetchAllUsers();
 
         eventRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        eventAdapter = new EventReportAdapter(events, users);
+        eventAdapter = new EventReportAdapter(events, users, this);
         eventRecyclerView.setAdapter(eventAdapter);
     }
 
