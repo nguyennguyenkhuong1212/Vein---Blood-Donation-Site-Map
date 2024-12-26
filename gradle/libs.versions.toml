@@ -1,5 +1,6 @@
 [versions]
 agp = "8.6.1"
+firebaseMessaging = "24.1.0"
 googleMapsServices = "0.18.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -17,6 +18,7 @@ firebaseFirestore = "25.1.1"
 slf4jSimple = "1.7.25"
 
 [libraries]
+firebase-messaging = { module = "com.google.firebase:firebase-messaging", version.ref = "firebaseMessaging" }
 google-maps-services = { module = "com.google.maps:google-maps-services", version.ref = "googleMapsServices" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

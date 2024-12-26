@@ -94,7 +94,15 @@ public class ManageSitePage extends Fragment {
                     double longitude = ((Double) data.get("longitude")).doubleValue();
                     String contactNumber = (String) data.get("contactNumber");
                     String operatingHours = (String) data.get("operatingHours");
-                    List<Integer> followerIds = (List<Integer>) data.get("followerIds");
+                    List<Integer> followerIds = new ArrayList<>();
+
+                    if (data.containsKey("followerIds") && data.get("followerIds") instanceof List<?>) {
+                        List<?> followerIdsObj = (List<?>) data.get("followerIds");
+                        assert followerIdsObj != null;
+                        for (Object obj : followerIdsObj) {
+                            followerIds.add(Math.toIntExact((Long) obj));
+                        }
+                    }
 
                     DonationSite site = new DonationSite(siteId, name, address, latitude, longitude,
                             contactNumber, operatingHours, adminId, followerIds);

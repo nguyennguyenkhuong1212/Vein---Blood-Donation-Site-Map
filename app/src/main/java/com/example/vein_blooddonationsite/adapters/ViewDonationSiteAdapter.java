@@ -2,11 +2,14 @@ package com.example.vein_blooddonationsite.adapters;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,7 +18,9 @@ import com.example.vein_blooddonationsite.R;
 import com.example.vein_blooddonationsite.activities.ViewEventActivity;
 import com.example.vein_blooddonationsite.models.DonationSite;
 import com.example.vein_blooddonationsite.models.User;
+import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.Iterator;
 import java.util.List;
 
 public class ViewDonationSiteAdapter extends RecyclerView.Adapter<ViewDonationSiteAdapter.ViewHolder> {
@@ -23,6 +28,7 @@ public class ViewDonationSiteAdapter extends RecyclerView.Adapter<ViewDonationSi
     public List<DonationSite> donationSites;
     public List<User> users;
     public User currentUser;
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     public ViewDonationSiteAdapter(List<DonationSite> donationSites, List<User> users) { // Modify constructor
         this.donationSites = donationSites;
@@ -66,6 +72,63 @@ public class ViewDonationSiteAdapter extends RecyclerView.Adapter<ViewDonationSi
             intent.putExtra("site", site);
             holder.itemView.getContext().startActivity(intent);
         });
+
+        Log.d("Test", String.valueOf(site.getFollowerIds()));
+        Log.d("Test", String.valueOf(currentUser.getUserId()));
+        if (currentUser != null && site.getFollowerIds().contains(currentUser.getUserId())) {
+            holder.followButton.setVisibility(View.GONE);
+            holder.unfollowButton.setVisibility(View.VISIBLE);
+        } else {
+            holder.followButton.setVisibility(View.VISIBLE);
+            holder.unfollowButton.setVisibility(View.GONE);
+        }
+
+        if (currentUser != null && currentUser.getUserId() == site.getAdminId()){
+            holder.followButton.setVisibility(View.GONE);
+            holder.unfollowButton.setVisibility(View.GONE);
+        }
+
+        holder.followButton.setOnClickListener(v -> {
+            if (currentUser == null) {
+                return;
+            }
+
+            site.getFollowerIds().add(currentUser.getUserId());
+            Log.d("Test", String.valueOf(site.getFollowerIds()));
+            db.collection("donationSites").document(String.valueOf(site.getSiteId())).set(site)
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(holder.itemView.getContext(), "Followed " + site.getName(), Toast.LENGTH_SHORT).show();
+                        holder.followButton.setVisibility(View.GONE);
+                        holder.unfollowButton.setVisibility(View.VISIBLE);
+                    })
+                    .addOnFailureListener(e ->
+                            Toast.makeText(holder.itemView.getContext(), "Failed to follow " + site.getName(), Toast.LENGTH_SHORT).show()
+                    );
+        });
+
+        holder.unfollowButton.setOnClickListener(v -> {
+            if (currentUser == null) {
+                return;
+            }
+
+            Log.d("Test", String.valueOf(site.getFollowerIds()));
+            Integer userId = currentUser.getUserId();
+
+            if (site.getFollowerIds().contains(userId)) {
+                site.getFollowerIds().remove(userId);
+                db.collection("donationSites").document(String.valueOf(site.getSiteId())).set(site)
+                        .addOnSuccessListener(aVoid -> {
+                            Toast.makeText(holder.itemView.getContext(), "Unfollowed " + site.getName(), Toast.LENGTH_SHORT).show();
+                            holder.followButton.setVisibility(View.VISIBLE);
+                            holder.unfollowButton.setVisibility(View.GONE);
+                        })
+                        .addOnFailureListener(e ->
+                                Toast.makeText(holder.itemView.getContext(), "Failed to unfollow " + site.getName(), Toast.LENGTH_SHORT).show()
+                        );
+            } else {
+                Toast.makeText(holder.itemView.getContext(), "User is not following this site", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
@@ -80,6 +143,8 @@ public class ViewDonationSiteAdapter extends RecyclerView.Adapter<ViewDonationSi
         public TextView contactNumberTextView;
         public TextView operatingHoursTextView;
         public LinearLayout viewEventButton;
+        public ImageButton unfollowButton;
+        public ImageButton followButton;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -89,6 +154,8 @@ public class ViewDonationSiteAdapter extends RecyclerView.Adapter<ViewDonationSi
             contactNumberTextView = itemView.findViewById(R.id.view_site_contact);
             operatingHoursTextView = itemView.findViewById(R.id.view_site_operating_hours);
             viewEventButton = itemView.findViewById(R.id.view_site_view_event_button);
+            followButton = itemView.findViewById(R.id.follow_button);
+            unfollowButton = itemView.findViewById(R.id.unfollow_button);
         }
     }
 }

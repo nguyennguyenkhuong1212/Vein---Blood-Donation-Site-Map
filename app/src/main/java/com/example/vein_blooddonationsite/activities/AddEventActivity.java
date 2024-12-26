@@ -19,6 +19,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.RemoteMessage;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -189,6 +191,10 @@ public class AddEventActivity extends AppCompatActivity {
                                                                         .set(newEvent)
                                                                         .addOnSuccessListener(documentReference -> {
                                                                             Toast.makeText(AddEventActivity.this, "Event added successfully", Toast.LENGTH_SHORT).show();
+
+                                                                            // Send notifications to followers
+                                                                            sendNotificationsToFollowers(site, newEvent);
+
                                                                             finish();
                                                                         })
                                                                         .addOnFailureListener(e -> {
@@ -318,5 +324,40 @@ public class AddEventActivity extends AppCompatActivity {
                         listener.onComplete(Tasks.forException(Objects.requireNonNull(task.getException())));
                     }
                 });
+    }
+
+    private void sendNotificationsToFollowers(DonationSite site, DonationSiteEvent event) {
+        List<Integer> followerIds = site.getFollowerIds();
+
+        Map<String, String> notificationPayload = new HashMap<>();
+        notificationPayload.put("title", "New Blood Donation Event!");
+        notificationPayload.put("body", "Event at " + site.getName() + " on " + event.getEventDate());
+
+        for (Integer followerId : followerIds) {
+            db.collection("users")
+                    .whereEqualTo("userId", followerId)
+                    .get()
+                    .addOnCompleteListener(userTask -> {
+                        if (userTask.isSuccessful()) {
+                            for (QueryDocumentSnapshot userDoc : userTask.getResult()) {
+                                String fcmToken = userDoc.getString("fcmToken");
+                                if (fcmToken != null) {
+                                    sendNotification(fcmToken, notificationPayload);
+                                }
+                            }
+                        } else {
+                            Log.w("AddEventActivity", "Error getting user documents", userTask.getException());
+                        }
+                    });
+        }
+    }
+
+    private void sendNotification(String fcmToken, Map<String, String> payload) {
+        RemoteMessage message = new RemoteMessage.Builder(fcmToken)
+                .setMessageId(Integer.toString((int) (Math.random() * 100000)))
+                .setData(payload)
+                .build();
+
+        FirebaseMessaging.getInstance().send(message);
     }
 }
