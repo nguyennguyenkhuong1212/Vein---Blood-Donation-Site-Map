@@ -1,15 +1,14 @@
 package com.example.vein_blooddonationsite.adapters;
 
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
-import android.graphics.Typeface;
 import android.graphics.pdf.PdfDocument;
 import android.net.Uri;
 import android.os.Environment;
@@ -249,21 +248,10 @@ public class EventReportAdapter extends RecyclerView.Adapter<EventReportAdapter.
 
             document.finishPage(page);
 
-            String filename = savePdfToMediaStore(context, document);
-
-            Uri pdfUri = getPdfUriFromMediaStore(context, filename);
-            if (pdfUri != null) {
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setDataAndType(pdfUri, "application/pdf");
-                intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                context.startActivity(intent);
-            } else {
-                // Handle case where PDF URI could not be retrieved
-                Toast.makeText(context, "Error opening PDF file", Toast.LENGTH_SHORT).show();
-            }
+            savePdfToMediaStore(context, document);
         }
 
-        private String savePdfToMediaStore(Context context, PdfDocument document) {
+        private void savePdfToMediaStore(Context context, PdfDocument document) {
             ContentResolver resolver = context.getContentResolver();
             String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
             String filename = "event_report_" + timeStamp + ".pdf";
@@ -281,7 +269,7 @@ public class EventReportAdapter extends RecyclerView.Adapter<EventReportAdapter.
                     if (outputStream != null) {
                         document.writeTo(outputStream);
                         Toast.makeText(context, "Report created successfully", Toast.LENGTH_SHORT).show();
-                        return filename;
+                        openPdfFile(context, pdfUri);
                     }
                 } catch (IOException e) {
                     Log.e("PDFSave", "Error saving PDF: ", e);
@@ -292,28 +280,18 @@ public class EventReportAdapter extends RecyclerView.Adapter<EventReportAdapter.
             } else {
                 Toast.makeText(context, "Failed to create file", Toast.LENGTH_SHORT).show();
             }
-
-            return null;
         }
 
-        private Uri getPdfUriFromMediaStore(Context context, String fileName) {
-            String selection = MediaStore.MediaColumns.DISPLAY_NAME + " = ?";
-            String[] selectionArgs = new String[]{fileName};
-
-            Cursor cursor = context.getContentResolver().query(
-                    MediaStore.Files.getContentUri("external"),
-                    new String[]{MediaStore.Files.getContentUri("external").toString()},
-                    selection,
-                    selectionArgs,
-                    null);
-
-            if (cursor != null && cursor.moveToFirst()) {
-                Uri uri = Uri.parse(cursor.getString(0));
-                cursor.close();
-                return uri;
+        private void openPdfFile(Context context, Uri pdfUri) {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(pdfUri, "application/pdf");
+            intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            Intent chooser = Intent.createChooser(intent, "Open PDF");
+            try {
+                context.startActivity(chooser);
+            } catch (ActivityNotFoundException e) {
+                Toast.makeText(context, "No application found to open PDF", Toast.LENGTH_SHORT).show();
             }
-
-            return null;
         }
 
     }
