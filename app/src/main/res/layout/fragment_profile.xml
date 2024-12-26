@@ -48,13 +48,15 @@
                         <TextView
                             android:layout_marginTop="-6dp"
                             android:layout_marginStart="-3dp"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="User Name"
                             android:textSize="18sp"
                             android:fontFamily="@font/playwrite"
                             android:textColor="@color/seashell"
                             android:id="@+id/profile_user_name"
+                            android:ellipsize="end"
+                            android:maxLines="1"
                             />
 
                         <TextView
@@ -65,6 +67,8 @@
                             android:fontFamily="@font/instrumentsans"
                             android:textColor="@color/white"
                             android:id="@+id/profile_user_email"
+                            android:ellipsize="end"
+                            android:maxLines="1"
                             />
 
                         <TextView
@@ -87,7 +91,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_gravity="center"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="75dp"
             >
                 <View
                     android:layout_width="match_parent"

@@ -154,7 +154,7 @@ public class AddEventActivity extends AppCompatActivity {
                                         if (siteTask.isSuccessful()) {
                                             List<Integer> adminSiteIds = new ArrayList<>();
                                             for (QueryDocumentSnapshot siteDoc : siteTask.getResult()) {
-                                                adminSiteIds.add(siteDoc.getLong("siteId").intValue());
+                                                adminSiteIds.add(Objects.requireNonNull(siteDoc.getLong("siteId")).intValue());
                                             }
 
                                             db.collection("events")
@@ -257,11 +257,6 @@ public class AddEventActivity extends AppCompatActivity {
         String existingEventDateString = sdf.format(existingEvent.getEventDate());
         String newEventDateString = sdf.format(newEventDate);
 
-        Log.d("HAHAHA", existingEvent.toString());
-        Log.d("HAHAHA", newEventDate.toString());
-        Log.d("HAHAHA", newStartTime.toString());
-        Log.d("HAHAHA", newEndTime.toString());
-
         if (existingEventDateString.equals(newEventDateString)) {
             LocalTime existingStartTime = LocalTime.of(existingEvent.getStartTime().get("hour"), existingEvent.getStartTime().get("minute"));
             LocalTime existingEndTime = LocalTime.of(existingEvent.getEndTime().get("hour"), existingEvent.getEndTime().get("minute"));
@@ -289,7 +284,7 @@ public class AddEventActivity extends AppCompatActivity {
                         new Date(),
                         event.getEventDate(),
                         donationTimeMap,
-                        "APPROVED",
+                        "COMPLETED",
                         "MANAGER"
                 );
 

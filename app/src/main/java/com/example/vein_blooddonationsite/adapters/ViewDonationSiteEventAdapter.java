@@ -118,7 +118,7 @@ public class ViewDonationSiteEventAdapter extends RecyclerView.Adapter<ViewDonat
                 if (!currentDate.after(twelveWeeksAfterDonation)) {
                     // It has not been 12 weeks yet
                     Toast.makeText(v.getContext(),
-                            "You must wait at least 12 weeks after your last donation.",
+                            "Your registration conflicts with an existing record or falls within your recovery period (12 weeks).",
                             Toast.LENGTH_SHORT).show();
                     return;
                 }

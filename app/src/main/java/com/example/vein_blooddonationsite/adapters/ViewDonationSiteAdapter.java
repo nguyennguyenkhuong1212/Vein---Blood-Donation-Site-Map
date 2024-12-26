@@ -86,6 +86,7 @@ public class ViewDonationSiteAdapter extends RecyclerView.Adapter<ViewDonationSi
         if (currentUser != null && currentUser.getUserId() == site.getAdminId()){
             holder.followButton.setVisibility(View.GONE);
             holder.unfollowButton.setVisibility(View.GONE);
+            holder.itemView.findViewById(R.id.top_buttons).setVisibility(View.GONE);
         }
 
         holder.followButton.setOnClickListener(v -> {

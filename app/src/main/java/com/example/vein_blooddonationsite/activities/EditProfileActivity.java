@@ -13,7 +13,9 @@ import com.example.vein_blooddonationsite.models.User;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class EditProfileActivity extends AppCompatActivity {
@@ -62,10 +64,20 @@ public class EditProfileActivity extends AppCompatActivity {
                     currentUser.setEmail(email);
                     currentUser.setBloodType(bloodType);
 
+                    Map<String, Object> userData = new HashMap<>();
+                    userData.put("userId", currentUser.getUserId());
+                    userData.put("name", name);
+                    userData.put("email", email);
+                    userData.put("username", username);
+                    userData.put("password", currentUser.getPassword());
+                    userData.put("bloodType", bloodType);
+                    userData.put("isSiteAdmin", currentUser.isSiteAdmin());
+                    userData.put("isSuperUser", currentUser.isSuperUser());
+
                     // Update the user data in Firestore
                     db.collection("users")
                             .document(String.valueOf(currentUser.getUserId()))
-                            .set(currentUser)
+                            .set(userData)
                             .addOnSuccessListener(aVoid -> {
                                 Toast.makeText(EditProfileActivity.this, "Profile updated successfully", Toast.LENGTH_SHORT).show();
                                 finish(); // Close the activity after successful update

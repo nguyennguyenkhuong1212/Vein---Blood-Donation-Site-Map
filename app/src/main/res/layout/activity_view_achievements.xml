@@ -6,6 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="16dp"
+    android:background="@color/seashell"
     tools:context=".activities.ViewAchievementsActivity">
 
     <LinearLayout
@@ -52,12 +53,13 @@
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="275dp"
+        android:layout_height="wrap_content"
         android:paddingHorizontal="36dp"
         android:textSize="20sp"
         android:textColor="@color/primary"
         android:text="No medals yet. Complete a blood donation to earn your first one!"
         android:gravity="center"
+        android:paddingVertical="20dp"
         android:id="@+id/view_achievement_medal_empty_inform"
         android:visibility="gone"
         />
@@ -100,12 +102,13 @@
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="275dp"
+        android:layout_height="wrap_content"
         android:paddingHorizontal="36dp"
         android:textSize="20sp"
         android:textColor="@color/primary"
         android:text="No registrations found."
         android:gravity="center"
+        android:paddingVertical="20dp"
         android:id="@+id/view_achievement_registration_empty_inform"
         android:visibility="gone"
         />

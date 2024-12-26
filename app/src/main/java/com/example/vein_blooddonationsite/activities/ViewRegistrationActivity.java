@@ -275,9 +275,9 @@ public class ViewRegistrationActivity extends AppCompatActivity {
                 Button completeButton = new Button(this);
                 completeButton.setBackground(ContextCompat.getDrawable(this, R.drawable.view_manage_site_button));
                 completeButton.setText("Complete");
-                completeButton.setTextSize(COMPLEX_UNIT_SP, 12);
+                completeButton.setTextSize(COMPLEX_UNIT_SP, 10);
                 completeButton.setTextColor(Color.WHITE);
-                completeButton.setPadding(5, -5, 5, -5);
+                completeButton.setPadding(5, -10, 5, -10);
                 completeButton.setLayoutParams(new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.WRAP_CONTENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT

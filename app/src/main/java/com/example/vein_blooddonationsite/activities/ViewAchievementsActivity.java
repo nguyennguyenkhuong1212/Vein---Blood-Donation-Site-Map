@@ -60,7 +60,10 @@ public class ViewAchievementsActivity extends AppCompatActivity {
 
     private void displayMedals(LinearLayout medalsContainer, User currentUser) {
         int numMedals = currentUser.getNumMedals(registrations);
-        Log.d("HAHAHA", String.valueOf(numMedals));
+        if (numMedals == 0){
+            medalEmptyInform.setVisibility(View.VISIBLE);
+            return;
+        }
         for (int i = 0; i < numMedals; i++) {
             ImageView medalImageView = new ImageView(this);
             medalImageView.setImageResource(R.drawable.baseline_medal_24);
@@ -69,7 +72,7 @@ public class ViewAchievementsActivity extends AppCompatActivity {
         }
     }
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint({"SetTextI18n", "DefaultLocale"})
     private void populateTable(TableLayout tableLayout) {
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
@@ -118,7 +121,10 @@ public class ViewAchievementsActivity extends AppCompatActivity {
             TableRow row = new TableRow(this);
 
             TextView dateTimeTextView = new TextView(this);
-            dateTimeTextView.setText(dateFormat.format(registration.getDonationDate()) + "\n" + registration.getDonationTime().get("hour") + ":" + registration.getDonationTime().get("minute"));
+            dateTimeTextView.setText(dateFormat.format(registration.getDonationDate()) + "\n"
+                    + String.format("%02d:%02d",
+                    registration.getDonationTime().get("hour"),
+                    registration.getDonationTime().get("minute")));
             dateTimeTextView.setLayoutParams(dateTimeParams);
             dateTimeTextView.setTypeface(dataFont);
             row.addView(dateTimeTextView);

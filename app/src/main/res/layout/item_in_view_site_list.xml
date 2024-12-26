@@ -7,27 +7,64 @@
     android:orientation="vertical"
     android:background="@drawable/item_in_manage_site_list"
     android:padding="16dp"
-    android:layout_margin="10dp"
-    >
+    android:layout_margin="10dp">
 
     <LinearLayout
         android:id="@+id/view_site_info"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:orientation="vertical"
         tools:ignore="Suspicious0dp">
 
-        <TextView
-            android:id="@+id/view_site_name"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Site Name"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:fontFamily="@font/instrumentsansbold"
-            android:textColor="@color/white"
-            android:layout_marginBottom="3dp" />
+            android:orientation="horizontal"
+            android:layout_marginBottom="5dp">
+
+            <TextView
+                android:id="@+id/view_site_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Site Name"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/instrumentsansbold"
+                android:textColor="@color/white" />
+
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:id="@+id/top_buttons"
+                >
+
+                <ImageButton
+                    android:id="@+id/follow_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/baseline_star_outline_24"
+                    android:padding="0dp"
+                    android:layout_marginTop="-1dp"
+                    android:backgroundTint="@color/transparent"
+                    android:contentDescription="Follow Button"
+                    app:tint="@color/white" />
+
+                <ImageButton
+                    android:id="@+id/unfollow_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/baseline_star_24"
+                    android:padding="0dp"
+                    android:layout_marginTop="-1dp"
+                    android:backgroundTint="@color/transparent"
+                    android:contentDescription="Unfollow Button"
+                    app:tint="@color/white" />
+
+            </FrameLayout>
+
+        </LinearLayout>
 
         <TextView
             android:id="@+id/view_site_address"
@@ -75,8 +112,7 @@
         android:orientation="horizontal"
         android:layout_marginTop="10dp"
         android:gravity="center"
-        android:layout_below="@id/view_site_info"
-        android:layout_weight="1">
+        android:layout_below="@id/view_site_info">
 
         <LinearLayout
             android:layout_width="175dp"
@@ -85,8 +121,7 @@
             android:gravity="center"
             android:background="@drawable/view_manage_site_button"
             android:paddingVertical="7dp"
-            android:id="@+id/view_site_view_event_button"
-            >
+            android:id="@+id/view_site_view_event_button">
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -101,37 +136,10 @@
                 android:textColor="@color/white"
                 android:fontFamily="@font/instrumentsansbold"
                 android:textSize="12sp"
-                android:layout_marginStart="8dp"
-                />
+                android:layout_marginStart="8dp" />
 
         </LinearLayout>
 
     </LinearLayout>
-
-    <ImageButton
-        android:id="@+id/follow_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/baseline_album_24"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
-        android:padding="0dp"
-        android:backgroundTint="@color/transparent"
-        android:contentDescription="Follow Button"
-        android:layout_marginTop="-1dp"
-        app:tint="@color/white"/>
-
-    <ImageButton
-        android:id="@+id/unfollow_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/baseline_star_24"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
-        android:padding="0dp"
-        android:backgroundTint="@color/transparent"
-        android:contentDescription="Follow Button"
-        android:layout_marginTop="-1dp"
-        app:tint="@color/white"/>
 
 </RelativeLayout>
