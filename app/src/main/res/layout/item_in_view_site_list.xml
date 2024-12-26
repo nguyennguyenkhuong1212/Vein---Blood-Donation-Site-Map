@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -11,6 +11,7 @@
     >
 
     <LinearLayout
+        android:id="@+id/view_site_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"
@@ -26,7 +27,7 @@
             android:textStyle="bold"
             android:fontFamily="@font/instrumentsansbold"
             android:textColor="@color/white"
-            android:layout_marginBottom="3dp"/>
+            android:layout_marginBottom="3dp" />
 
         <TextView
             android:id="@+id/view_site_address"
@@ -74,6 +75,7 @@
         android:orientation="horizontal"
         android:layout_marginTop="10dp"
         android:gravity="center"
+        android:layout_below="@id/view_site_info"
         android:layout_weight="1">
 
         <LinearLayout
@@ -106,4 +108,30 @@
 
     </LinearLayout>
 
-</LinearLayout>
+    <ImageButton
+        android:id="@+id/follow_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/baseline_album_24"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:padding="0dp"
+        android:backgroundTint="@color/transparent"
+        android:contentDescription="Follow Button"
+        android:layout_marginTop="-1dp"
+        app:tint="@color/white"/>
+
+    <ImageButton
+        android:id="@+id/unfollow_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/baseline_star_24"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:padding="0dp"
+        android:backgroundTint="@color/transparent"
+        android:contentDescription="Follow Button"
+        android:layout_marginTop="-1dp"
+        app:tint="@color/white"/>
+
+</RelativeLayout>

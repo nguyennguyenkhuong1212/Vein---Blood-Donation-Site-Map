@@ -211,23 +211,12 @@ public class HomePage extends Fragment {
                                     return;
                                 }
 
+                                sites.clear();
                                 assert response != null;
+
                                 for (QueryDocumentSnapshot document : response) {
                                     try {
-                                        Map<String, Object> data = document.getData();
-
-                                        int adminId = ((Long) Objects.requireNonNull(data.get("adminId"))).intValue();
-                                        int siteId = ((Long) Objects.requireNonNull(data.get("siteId"))).intValue();
-                                        String name = (String) data.get("name");
-                                        String address = (String) data.get("address");
-                                        double latitude = ((Double) data.get("latitude")).doubleValue();
-                                        double longitude = ((Double) data.get("longitude")).doubleValue();
-                                        String contactNumber = (String) data.get("contactNumber");
-                                        String operatingHours = (String) data.get("operatingHours");
-                                        List<Integer> followerIds = (List<Integer>) data.get("followerIds");
-
-                                        DonationSite site = new DonationSite(siteId, name, address, latitude, longitude,
-                                                contactNumber, operatingHours, adminId, followerIds);
+                                        DonationSite site = getDonationSite(document);
                                         sites.add(site);
                                     } catch (ClassCastException | NullPointerException e) {
                                         Log.e("ManageSitePage", "Error parsing document data: " + e.getMessage());
@@ -252,6 +241,32 @@ public class HomePage extends Fragment {
                     Log.w("HomePage", "Error getting users.", task.getException());
                 }
             });
+    }
+
+    @NonNull
+    private static DonationSite getDonationSite(QueryDocumentSnapshot document) {
+        Map<String, Object> data = document.getData();
+
+        int adminId = ((Long) Objects.requireNonNull(data.get("adminId"))).intValue();
+        int siteId = ((Long) Objects.requireNonNull(data.get("siteId"))).intValue();
+        String name = (String) data.get("name");
+        String address = (String) data.get("address");
+        double latitude = (Double) data.get("latitude");
+        double longitude = (Double) data.get("longitude");
+        String contactNumber = (String) data.get("contactNumber");
+        String operatingHours = (String) data.get("operatingHours");
+        List<Integer> followerIds = new ArrayList<>();
+
+        if (data.containsKey("followerIds") && data.get("followerIds") instanceof List<?>) {
+            List<?> followerIdsObj = (List<?>) data.get("followerIds");
+            assert followerIdsObj != null;
+            for (Object obj : followerIdsObj) {
+                followerIds.add(Math.toIntExact((Long) obj));
+            }
+        }
+
+        return new DonationSite(siteId, name, address, latitude, longitude,
+                contactNumber, operatingHours, adminId, followerIds);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
