@@ -22,6 +22,14 @@ import com.google.android.material.navigation.NavigationBarView;
 public class MainActivity extends AppCompatActivity {
     User currentUser;
 
+    public User getCurrentUser() {
+        return currentUser;
+    }
+
+    public void setCurrentUser(User user) {
+        this.currentUser = user;
+    }
+
     private final NavigationBarView.OnItemSelectedListener navListener =
             item -> {
                 int itemId = item.getItemId();

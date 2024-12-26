@@ -1,5 +1,6 @@
 package com.example.vein_blooddonationsite.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
@@ -80,7 +81,10 @@ public class EditProfileActivity extends AppCompatActivity {
                             .set(userData)
                             .addOnSuccessListener(aVoid -> {
                                 Toast.makeText(EditProfileActivity.this, "Profile updated successfully", Toast.LENGTH_SHORT).show();
-                                finish(); // Close the activity after successful update
+                                Intent resultIntent = new Intent();
+                                resultIntent.putExtra("updatedUser", currentUser);
+                                setResult(RESULT_OK, resultIntent);
+                                finish();
                             })
                             .addOnFailureListener(e -> {
                                 Toast.makeText(EditProfileActivity.this, "Error updating profile", Toast.LENGTH_SHORT).show();
