@@ -28,14 +28,6 @@ public class GenerateReportActivity extends AppCompatActivity {
     private final List<User> users = new ArrayList<>();
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    private final ActivityResultLauncher<Intent> saveFileLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            result -> {
-                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                    // The URI will be handled by EventReportAdapter
-                }
-            });
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

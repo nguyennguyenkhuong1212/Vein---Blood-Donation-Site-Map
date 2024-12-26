@@ -11,4 +11,6 @@
     <color name="dark_orange">#dd5c08</color>
     <color name="light_gray">#949494</color>
     <color name="transparent">#00FFFFFF</color>
+    <color name="red_tone_1">#6D0708</color>
+    <color name="red_tone_2">#CC9C9C</color>
 </resources>

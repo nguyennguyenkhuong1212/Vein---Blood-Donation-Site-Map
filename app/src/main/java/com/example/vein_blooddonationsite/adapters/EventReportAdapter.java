@@ -3,8 +3,13 @@ package com.example.vein_blooddonationsite.adapters;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.graphics.pdf.PdfDocument;
 import android.net.Uri;
 import android.os.Environment;
@@ -18,6 +23,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.vein_blooddonationsite.R;
@@ -33,6 +40,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -155,10 +163,19 @@ public class EventReportAdapter extends RecyclerView.Adapter<EventReportAdapter.
             PdfDocument.Page page = document.startPage(pageInfo);
             Canvas canvas = page.getCanvas();
             Paint paint = new Paint();
+            paint.setTypeface(ResourcesCompat.getFont(context, R.font.instrumentsansbold));
+            paint.setColor(ContextCompat.getColor(context, R.color.primary));
 
             int canvasWidth = pageInfo.getPageWidth();
-            int y = 50; // Start Y position
-            paint.setTextSize(18);
+
+            String header = "Vein - Blood Donation Site Map";
+            paint.setTextSize(16);
+            float headerWidth = paint.measureText(header);
+            canvas.drawText(header, (canvasWidth - headerWidth) / 2, 30, paint);
+
+            int y = 180; // Start Y position
+            paint.setTextSize(20);
+            paint.setColor(Color.BLACK);
 
             // Centered "Event Report" title
             String title = "Event Report";
@@ -172,7 +189,7 @@ public class EventReportAdapter extends RecyclerView.Adapter<EventReportAdapter.
             float eventNameWidth = paint.measureText(eventName);
             canvas.drawText(eventName, (canvasWidth - eventNameWidth) / 2, y, paint);
 
-            y += 20;
+            y += 30;
 
             // Event Date
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
@@ -188,51 +205,83 @@ public class EventReportAdapter extends RecyclerView.Adapter<EventReportAdapter.
             float totalBloodWidth = paint.measureText(totalBlood);
             canvas.drawText(totalBlood, (canvasWidth - totalBloodWidth) / 2, y, paint);
 
-            y += 30;
+            y += 60;
+            canvas.drawText("Blood Types Breakdown: ", (canvasWidth - paint.measureText("Blood Types Breakdown: ")) / 2, y, paint);
+
+            y += 140;
 
             // Blood Type Breakdown
-            String breakdownHeader = "Blood Type Breakdown:";
-            float breakdownHeaderWidth = paint.measureText(breakdownHeader);
-            canvas.drawText(breakdownHeader, (canvasWidth - breakdownHeaderWidth) / 2, y, paint);
+            int pieChartY = y;
+            int pieChartRadius = 100;
+            int pieChartX = canvasWidth / 2;
+            RectF pieChartRect = new RectF(pieChartX - pieChartRadius, pieChartY - pieChartRadius,
+                    pieChartX + pieChartRadius, pieChartY + pieChartRadius);
 
-            y += 20;
+            float totalUnits = 0;
+            for (int count : bloodTypeCounts.values()) {
+                totalUnits += count;
+            }
 
-            // Iterate through blood type counts
+            float startAngle = 0;
             for (Map.Entry<String, Integer> entry : bloodTypeCounts.entrySet()) {
-                String bloodTypeLine = entry.getKey() + ": " + entry.getValue() + " units";
-                float bloodTypeLineWidth = paint.measureText(bloodTypeLine);
-                canvas.drawText(bloodTypeLine, (canvasWidth - bloodTypeLineWidth) / 2, y, paint);
+                paint.setStyle(Paint.Style.FILL);
+                paint.setColor(getColorForBloodType(context, entry.getKey())); // Pass context
+                float sweepAngle = (entry.getValue() / totalUnits) * 360;
+                canvas.drawArc(pieChartRect, startAngle, sweepAngle, true, paint);
+                startAngle += sweepAngle;
+            }
+
+            // Legend for the pie chart
+            y = pieChartY + pieChartRadius + 30;
+            paint.setTextSize(16);
+
+            int legendX = pieChartX + 10;
+
+            for (Map.Entry<String, Integer> entry : bloodTypeCounts.entrySet()) {
+                paint.setColor(getColorForBloodType(context, entry.getKey()));
+
+                // Adjust rectangle and text positions based on legendX
+                canvas.drawRect(legendX - 100, y - 10, legendX - 80, y + 10, paint);
+                canvas.drawText(entry.getKey() + ": " + entry.getValue() + (entry.getValue() > 1 ? " units" : " unit") + " (" + entry.getValue() * 300 + "ml)", legendX - 70, y + 5, paint);
+
                 y += 20;
             }
 
             document.finishPage(page);
 
-            savePdfToMediaStore(context, document);
+            String filename = savePdfToMediaStore(context, document);
+
+            Uri pdfUri = getPdfUriFromMediaStore(context, filename);
+            if (pdfUri != null) {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setDataAndType(pdfUri, "application/pdf");
+                intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                context.startActivity(intent);
+            } else {
+                // Handle case where PDF URI could not be retrieved
+                Toast.makeText(context, "Error opening PDF file", Toast.LENGTH_SHORT).show();
+            }
         }
 
-        private void savePdfToMediaStore(Context context, PdfDocument document) {
+        private String savePdfToMediaStore(Context context, PdfDocument document) {
             ContentResolver resolver = context.getContentResolver();
+            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+            String filename = "event_report_" + timeStamp + ".pdf";
 
             ContentValues contentValues = new ContentValues();
-            contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, "event_report.pdf");
+            contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, filename);
             contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf");
 
-            // Determine the download directory based on Android version
-            String downloadDirectory;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-                downloadDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
-            } else {
-                downloadDirectory = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download";
-            }
-            contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, downloadDirectory);
-
+            // Set to a valid directory
+            contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOCUMENTS);
 
             Uri pdfUri = resolver.insert(MediaStore.Files.getContentUri("external"), contentValues);
             if (pdfUri != null) {
                 try (OutputStream outputStream = resolver.openOutputStream(pdfUri)) {
                     if (outputStream != null) {
                         document.writeTo(outputStream);
-                        Toast.makeText(context, "PDF saved successfully", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Report created successfully", Toast.LENGTH_SHORT).show();
+                        return filename;
                     }
                 } catch (IOException e) {
                     Log.e("PDFSave", "Error saving PDF: ", e);
@@ -243,6 +292,44 @@ public class EventReportAdapter extends RecyclerView.Adapter<EventReportAdapter.
             } else {
                 Toast.makeText(context, "Failed to create file", Toast.LENGTH_SHORT).show();
             }
+
+            return null;
+        }
+
+        private Uri getPdfUriFromMediaStore(Context context, String fileName) {
+            String selection = MediaStore.MediaColumns.DISPLAY_NAME + " = ?";
+            String[] selectionArgs = new String[]{fileName};
+
+            Cursor cursor = context.getContentResolver().query(
+                    MediaStore.Files.getContentUri("external"),
+                    new String[]{MediaStore.Files.getContentUri("external").toString()},
+                    selection,
+                    selectionArgs,
+                    null);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                Uri uri = Uri.parse(cursor.getString(0));
+                cursor.close();
+                return uri;
+            }
+
+            return null;
+        }
+
+    }
+
+    private static int getColorForBloodType(Context context, String bloodType) {
+        switch (bloodType) {
+            case "A":
+                return ContextCompat.getColor(context, R.color.primary);
+            case "B":
+                return ContextCompat.getColor(context, R.color.secondary);
+            case "AB":
+                return ContextCompat.getColor(context, R.color.red_tone_1);
+            case "O":
+                return ContextCompat.getColor(context, R.color.red_tone_2);
+            default:
+                return Color.MAGENTA;
         }
     }
 }
