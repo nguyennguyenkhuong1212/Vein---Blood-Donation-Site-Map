@@ -129,6 +129,8 @@ public class HomePage extends Fragment {
         assert getArguments() != null;
         currentUser = (User) getArguments().getSerializable("user");
 
+        fetchAllDonationSites();
+
         ImageButton filterButton = view.findViewById(R.id.filter_button);
 
         filterButton.setOnClickListener(v -> {
@@ -140,15 +142,12 @@ public class HomePage extends Fragment {
         viewDonationSitesRecyclerView = view.findViewById(R.id.view_all_donation_sites_recycler_view);
         viewDonationSitesRecyclerView.setAdapter(adapter);
 
-
         getLocation(task -> {
             if (!task.isSuccessful()) {
                 Log.e("HomePage", "Error getting location", task.getException());
                 throw new RuntimeException("Failed to get location", task.getException());
             }
         });
-
-        fetchAllDonationSites();
 
         search_bar.addTextChangedListener(new TextWatcher() {
             @Override
@@ -338,17 +337,13 @@ public class HomePage extends Fragment {
 
                 // Fetch donation sites
                 List<DonationSite> filteredSites = new ArrayList<>();
-                List<DonationSite> fetchedSites =
-                        Tasks.await(
-                                db.collection("donationSites").get())
-                                .toObjects(DonationSite.class);
 
                 // Convert eventDateString to Date object
                 Date eventDate = getDate(eventDateString);
 
                 Log.d("HomePage", "Distance: " + distance);
 
-                for (DonationSite site : fetchedSites) {
+                for (DonationSite site : sites) {
                     boolean matchedFilter = true;
                     // Distance filter (if you want to use it)
                     if (distance != 0) {
