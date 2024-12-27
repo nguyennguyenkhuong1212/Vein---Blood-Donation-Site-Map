@@ -29,7 +29,6 @@ The Vein - Blood Donation Site Map provides the following features:
 
 	- Create and manage blood donation sites.
 	- View registered donors and volunteers for their sites.
-	- Input post-event data such as blood volume and types collected.
 	- Register themselves as volunteers for other donation sites.
 
 + Super User Features:
